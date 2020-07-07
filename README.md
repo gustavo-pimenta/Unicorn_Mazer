@@ -1,4 +1,4 @@
-UNICORN MAZER
+# UNICORN MAZER
 
 Game page to download, install and play: https://gustavo-pimenta.itch.io/unicorn-mazer
 
