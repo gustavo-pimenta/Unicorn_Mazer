@@ -1,3 +1,0 @@
-How to Convert Python to Exe and Create An Installer
-
-https://www.youtube.com/watch?v=RrpvNvklmFA
