@@ -19,13 +19,9 @@ def num6dig(num):
 
 
 # INICIAR E VERIFICAR SE PYGAME ESTA FUNCIONANDO
-print('\n\n\nSistema Teste para Desenvolvimentos de Plataformas Interativas')
-print('Gustavo Pimenta')
-print('\nInicializando PyGame')
-
 try:
     pygame.init()
-    print("(+) O Pygame foi Inicializado com sucesso!")
+    print("O Pygame foi Inicializado com sucesso!")
 except:
     print("O Sistema Apresentou Dificuldade para Inicializar o Pygame, Aguarde...")
     check_errors = pygame.init()
