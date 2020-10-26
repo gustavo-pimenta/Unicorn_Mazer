@@ -29,27 +29,25 @@ def num6dig(num): # always keep six numbers in the score
     return ''.join(l)
 
 pygame.init() # start pygame system
-start_size = (800, 500) # start size of the screen when the game opens
-screen = pygame.display.set_mode((start_size),RESIZABLE) # create the screen
+width = 500 # initial width of the screen when the game opens
+height = 800 # initial height of the screen when the game opens
+screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
 second_screen = screen.copy() # create the second screen
 
 
 
-try:
-    uni_right = pygame.image.load('game_files/images/big_uni_right.png')
-    print('\nSucesso ao carregar a imagem uni_right.png')
-except:
-    print('\nERRO')
-    print('Falha ao carregar a imagem uni_right.png')
+
+uni = pygame.image.load('game_files/images/uni.png')
+    
 
 
-menu = True
+start_menu = True
 
 
 while True: # game main loop
 
     
-    while menu:
+    while start_menu:
 
         pygame.event.pump()
         event = pygame.event.wait()
@@ -62,9 +60,12 @@ while True: # game main loop
             new_size = event.dict['size'] # get the new size
             new_size = list(new_size)
             new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
-
+            width, height = new_size 
+            print('SCREEN RESOLUTION = (', width, ',', height, ')')
+            
             # apply the new size into the window
             screen = pygame.display.set_mode(new_size,RESIZABLE)
-            second_screen.blit(uni_right, (10, 10))
+            second_screen.blit(uni, (10, 10))
             screen.blit(pygame.transform.scale(second_screen, new_size), (0, 0))
+
             pygame.display.flip()
