@@ -13,8 +13,8 @@ A new (and much better) version start to be developed in 2020 october and will b
 
 ## Team
 
-*Gustavo Pimenta - Developer / Coder
-*Elayres Abreu - Designer / Pixel Artist
+* Gustavo Pimenta - Developer / Coder
+* Elayres Abreu - Designer / Pixel Artist
 
 
 
