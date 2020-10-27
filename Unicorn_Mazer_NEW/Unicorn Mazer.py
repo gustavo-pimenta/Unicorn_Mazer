@@ -17,6 +17,21 @@ from random import randrange
 import sys
 import csv
 
+# Game Colors
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
+blue = (0,0,255)
+green = (0,255,0)
+yellow = (255,255,0)
+pink = (255,15,192)
+purple = (148,0,211)
+orange = (255,127,0)
+salmon = (250,127,117)
+babby_blue =(173,216,230)
+brown = (150,75,0)
+wine = (94,33,41)
+
 def num6dig(num): # always keep six numbers in the score 
     l = ['0','0','0','0','0','0']
     index = 6
@@ -28,8 +43,16 @@ def num6dig(num): # always keep six numbers in the score
         l.pop(0)
     return ''.join(l)
 
-def screen_print(sprite, size, pos):
+def erase(): # turn the whole main screen black
+    black_screen = pygame.Surface((800,500))
+    black_screen.fill(black)
+    screen.blit(black_screen,(0,0))
+    pygame.display.flip()
+
+def screen_print(sprite, size, pos): # draw a image in the second screen
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
+
+
 
 pygame.init() # start pygame system
 width = 500 # initial width of the screen when the game opens
@@ -42,7 +65,7 @@ uni = pygame.image.load('game_files/images/uni.png')
 
 
 while True: # game main loop
-    
+
     while start_menu:
 
         for event in pygame.event.get():
@@ -61,5 +84,5 @@ while True: # game main loop
 
         screen_print(uni, (100,100), (300,300))
 
-        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) 
-        pygame.display.flip()
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
+        pygame.display.flip() # update screen
