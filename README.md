@@ -1,6 +1,6 @@
 # UNICORN MAZER
 
-Unicorn Mazer is an Old-School Maze Game, with Cupcakes, Coffee and Evil Bulls.
+### Unicorn Mazer is an Old-School Maze Game, with Cupcakes, Coffee and Evil Bulls.
 
 ## Download and Play: https://gustavo-pimenta.itch.io/unicorn-mazer
 
