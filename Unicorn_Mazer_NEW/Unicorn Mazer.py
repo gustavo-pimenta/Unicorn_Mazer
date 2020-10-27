@@ -53,7 +53,6 @@ def screen_print(sprite, size, pos): # draw a image in the second screen
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
 
 
-
 pygame.init() # start pygame system
 width = 500 # initial width of the screen when the game opens
 height = 800 # initial height of the screen when the game opens
@@ -81,6 +80,37 @@ while True: # game main loop
                 height, width = new_size # update vars with the new size value
                 screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
                 print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                is_moving_up = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_UP:
+                is_moving_up = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                is_moving_down = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_DOWN:
+                is_moving_down = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                is_moving_right = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+                is_moving_right = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                is_moving_left = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+                is_moving_left = False
+
+        if is_moving_up==True:
+            uni_y_temp = uni_y-20
+        if is_moving_down==True:
+            uni_y_temp = uni_y+20
+        if is_moving_left==True:
+            uni_x_temp = uni_x-20
+            uni = uni_left
+        if is_moving_right==True:
+            uni_x_temp = uni_x+20
+            uni = uni_right
 
         screen_print(uni, (100,100), (300,300))
 
