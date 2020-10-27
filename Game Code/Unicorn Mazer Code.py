@@ -11,11 +11,8 @@
 import pygame
 from pygame.locals import *
 import pygame.mixer
-import time
-import random
+import time, random, sys, csv
 from random import randrange
-import sys
-import csv
 
 # Game Colors
 black = (0,0,0)
@@ -52,6 +49,40 @@ def erase(): # turn the whole main screen black
 def screen_print(sprite, size, pos): # draw a image in the second screen
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
 
+class Unicorn(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load(r'.\game_files\images\uni.png').convert_alpha(),
+                       pygame.image.load('game_files/images/uni.png').convert_alpha(),
+                       pygame.image.load('game_files/images/uni.png').convert_alpha()]
+
+        self.speed = 10
+
+        self.current_image = 0
+
+        self.image = pygame.image.load('game_files/images/uni.png').convert_alpha()
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = 30
+        self.rect[1] = 30
+
+    def update(self):
+        self.current_image = (self.current_image + 1) % 3
+        self.image = self.images[ self.current_image ]
+
+        self.speed += 1
+
+        # Update height
+        self.rect[1] += self.speed
+    
+    def bump(self):
+        self.speed = -10
+uni_group = pygame.sprite.Group()
+uni = Unicorn()
+uni_group.add(uni)
 
 pygame.init() # start pygame system
 width = 500 # initial width of the screen when the game opens
@@ -101,18 +132,19 @@ while True: # game main loop
             elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
                 is_moving_left = False
 
-        if is_moving_up==True:
-            uni_y_temp = uni_y-20
-        if is_moving_down==True:
-            uni_y_temp = uni_y+20
-        if is_moving_left==True:
-            uni_x_temp = uni_x-20
-            uni = uni_left
-        if is_moving_right==True:
-            uni_x_temp = uni_x+20
-            uni = uni_right
+        # if is_moving_up==True:
+        #     uni_y_temp = uni_y-20
+        # if is_moving_down==True:
+        #     uni_y_temp = uni_y+20
+        # if is_moving_left==True:
+        #     uni_x_temp = uni_x-20
+        #     uni = uni_left
+        # if is_moving_right==True:
+        #     uni_x_temp = uni_x+20
+        #     uni = uni_right
 
-        screen_print(uni, (100,100), (300,300))
+        uni_group.update()
+        uni_group.draw(second_screen)
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
