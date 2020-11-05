@@ -49,8 +49,9 @@ def num6dig(num): # always keep six numbers in the score
 def erase(): # turn the whole main screen black
     black_screen = pygame.Surface((800,500))
     black_screen.fill(black)
-    screen.blit(black_screen,(0,0))
-    pygame.display.flip()
+    second_screen.blit(black_screen,(0,0)) # erase the second screen
+    screen.blit(black_screen,(0,0)) # erase the main screen 
+    # pygame.display.flip()
 
 def screen_print(sprite, size, pos): # draw a image in the second screen
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
@@ -66,7 +67,7 @@ class Unicorn(pygame.sprite.Sprite):
 
         self.current_image = 0
 
-        self.image = pygame.image.load('uni.png').convert_alpha()
+        self.image = pygame.image.load('big_uni_right.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
 
         self.rect = self.image.get_rect()
@@ -75,11 +76,12 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving, event_key):
         if moving == True:
-            if event.key == pygame.K_UP: self.rect[1] -= 20
-            elif event.key == pygame.K_DOWN: self.rect[1] += 20
-            elif event.key == pygame.K_RIGHT: self.rect[0] += 20
-            elif event.key == pygame.K_LEFT: self.rect[0] -= 20
+            if event.key == pygame.K_UP: self.rect[1] -= 5
+            elif event.key == pygame.K_DOWN: self.rect[1] += 5
+            elif event.key == pygame.K_RIGHT: self.rect[0] += 5
+            elif event.key == pygame.K_LEFT: self.rect[0] -= 5
             erase()
+            time.sleep(0.01)
 
         # self.current_image = (self.current_image + 1) % 3
         # self.image = self.images[ self.current_image ]   
@@ -117,8 +119,8 @@ while True: # game main loop
                 moving = True 
                 event_key = event.key
             if event.type == pygame.KEYUP: moving = False # detect key released up
-            try: uni_group.update(moving, event_key) # send key pressed info to move
-            except: pass
+        try: uni_group.update(moving, event_key) # send key pressed info to move
+        except: pass
 
 
         uni_group.draw(second_screen)
