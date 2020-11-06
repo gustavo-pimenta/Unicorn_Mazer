@@ -73,21 +73,22 @@ class Unicorn(pygame.sprite.Sprite):
         self.rect[0] = 30
         self.rect[1] = 30
 
-    def update(self, moving, event_key):
-        if moving == True:
-            if event.key == pygame.K_UP: self.rect[1] -= 5 # move up
-            elif event.key == pygame.K_DOWN: self.rect[1] += 5 # move down
-            elif event.key == pygame.K_RIGHT: 
-                self.rect[0] += 5 # move right
-                self.image = self.images[0] # change sprite
-            elif event.key == pygame.K_LEFT: 
-                self.rect[0] -= 5 # move left
-                self.image = self.images[1] # change sprite
-            erase()
-            time.sleep(0.01)
+    def update(self, moving_up, moving_down, moving_left, moving_right):
 
-        # self.current_image = (self.current_image + 1) % 3
-        # self.image = self.images[ self.current_image ]   
+        if moving_up == True: 
+            self.rect[1] -= 5 # move up  
+        if moving_down == True: 
+            self.rect[1] += 5 # move down
+        if moving_left==True:
+            self.rect[0] -= 5 # move left
+            self.image = self.images[1] # change sprite
+        if moving_right==True:
+            self.rect[0] += 5 # move right
+            self.image = self.images[0] # change sprite
+        erase()
+        time.sleep(0.01) # delay to control speed
+
+          
     
     def bump(self):
         self.speed = -10
@@ -97,6 +98,7 @@ uni = Unicorn()
 uni_group.add(uni)
 
 start_menu = True
+
 
 while True: # game main loop
 
@@ -115,12 +117,21 @@ while True: # game main loop
                 screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
                 print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
-            if event.type == pygame.KEYDOWN: # detect key pressed down
-                moving = True 
-                event_key = event.key
-            if event.type == pygame.KEYUP: moving = False # detect key released up
-        try: uni_group.update(moving, event_key) # send key pressed info to move
-        except: pass
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP: moving_up = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_UP: moving_up = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN: moving_down = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_DOWN: moving_down = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT: moving_right = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT: moving_right = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True
+            elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
+
+        try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
+        except: print('MOVING ERROR')
 
         uni_group.draw(second_screen)
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
