@@ -56,6 +56,13 @@ def erase(): # turn the whole main screen black
 def screen_print(sprite, size, pos): # draw a image in the second screen
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
 
+def break_move(): # break all the movement off the unicorn to change stage
+    global moving_up, moving_down, moving_left, moving_right
+    moving_up = False
+    moving_down = False
+    moving_left = False
+    moving_right = False
+
 class Unicorn(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -93,11 +100,13 @@ class Unicorn(pygame.sprite.Sprite):
     def bump(self):
         self.speed = -10
 
+
 uni_group = pygame.sprite.Group()
 uni = Unicorn()
 uni_group.add(uni)
 
 start_menu = True
+break_move()
 
 
 while True: # game main loop
@@ -131,7 +140,7 @@ while True: # game main loop
             elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
         try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
-        except: print('MOVING ERROR')
+        except: print('ALERT: MOVING ERROR')
 
         uni_group.draw(second_screen)
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
