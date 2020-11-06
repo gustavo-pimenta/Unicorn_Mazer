@@ -61,9 +61,8 @@ class Unicorn(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.images = [pygame.image.load('uni.png').convert_alpha(),
-                       pygame.image.load('big_uni_left.png').convert_alpha(),
-                       pygame.image.load('big_uni_right.png').convert_alpha()]
+        self.images = [pygame.image.load('big_uni_right.png').convert_alpha(),
+                       pygame.image.load('big_uni_left.png').convert_alpha()]
 
         self.current_image = 0
 
@@ -76,10 +75,14 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving, event_key):
         if moving == True:
-            if event.key == pygame.K_UP: self.rect[1] -= 5
-            elif event.key == pygame.K_DOWN: self.rect[1] += 5
-            elif event.key == pygame.K_RIGHT: self.rect[0] += 5
-            elif event.key == pygame.K_LEFT: self.rect[0] -= 5
+            if event.key == pygame.K_UP: self.rect[1] -= 5 # move up
+            elif event.key == pygame.K_DOWN: self.rect[1] += 5 # move down
+            elif event.key == pygame.K_RIGHT: 
+                self.rect[0] += 5 # move right
+                self.image = self.images[0] # change sprite
+            elif event.key == pygame.K_LEFT: 
+                self.rect[0] -= 5 # move left
+                self.image = self.images[1] # change sprite
             erase()
             time.sleep(0.01)
 
