@@ -93,10 +93,7 @@ uni_group = pygame.sprite.Group()
 uni = Unicorn()
 uni_group.add(uni)
 
-
 start_menu = True
-
-
 
 while True: # game main loop
 
@@ -121,7 +118,6 @@ while True: # game main loop
             if event.type == pygame.KEYUP: moving = False # detect key released up
         try: uni_group.update(moving, event_key) # send key pressed info to move
         except: pass
-
 
         uni_group.draw(second_screen)
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
