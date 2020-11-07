@@ -96,9 +96,11 @@ def event_reader(): # read and direct all screen events
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
-def wall_collide(): # check collide with the maze wall
-    if (pygame.sprite.groupcollide(uni_group, wall_group, False, False, pygame.sprite.collide_mask)):
-        print('COLLIDE')      
+def wall_collide(group): # check collide with the maze wall
+    if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
+        return True
+    else: 
+        return False    
 
 class Unicorn(pygame.sprite.Sprite):
 
@@ -128,15 +130,23 @@ class Unicorn(pygame.sprite.Sprite):
         SPEED = 2
 
         if moving_up == True: 
-            self.rect[1] -= SPEED # move up  
+            self.rect[1] -= SPEED # move up 
+            if wall_collide(uni_group)==True:
+                self.rect[1] += SPEED # undo the move if hit a wall
         if moving_down == True: 
             self.rect[1] += SPEED # move down
+            if wall_collide(uni_group)==True:
+                self.rect[1] -= SPEED # undo the move if hit a wall
         if moving_left==True:
             self.rect[0] -= SPEED # move left
             self.image = self.images[1] # change sprite
+            if wall_collide(uni_group)==True:
+                self.rect[0] += SPEED # undo the move if hit a wall
         if moving_right==True:
             self.rect[0] += SPEED # move right
             self.image = self.images[0] # change sprite
+            if wall_collide(uni_group)==True:
+                self.rect[0] -= SPEED # undo the move if hit a wall
         erase()
     
     def bump(self):
@@ -184,7 +194,7 @@ while True: # game main loop
 
         event_reader()
 
-        wall_collide()
+        
 
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
