@@ -115,28 +115,54 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
 
+        SPEED = 2
+
         if moving_up == True: 
-            self.rect[1] -= 5 # move up  
+            self.rect[1] -= SPEED # move up  
         if moving_down == True: 
-            self.rect[1] += 5 # move down
+            self.rect[1] += SPEED # move down
         if moving_left==True:
-            self.rect[0] -= 5 # move left
+            self.rect[0] -= SPEED # move left
             self.image = self.images[1] # change sprite
         if moving_right==True:
-            self.rect[0] += 5 # move right
+            self.rect[0] += SPEED # move right
             self.image = self.images[0] # change sprite
         erase()
-        time.sleep(0.01) # delay to control speed
-
-          
     
     def bump(self):
         self.speed = -10
 
+class Wall(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('wall.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (500,500))
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = 150
+        self.rect[1] = 0
+
+        # if inverted:
+        #     self.image = pygame.transform.flip(self.image, False, True)
+        #     self.rect[1] = - (self.rect[3] - ysize)
+        # else:
+        #     self.rect[1] = SCREEN_HEIGHT - ysize
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self):
+        # self.rect[0] -= GAME_SPEED
+        pass
 
 uni_group = pygame.sprite.Group()
 uni = Unicorn()
 uni_group.add(uni)
+
+wall_group = pygame.sprite.Group()
+wall = Wall()
+wall_group.add(wall)
 
 start_menu = True
 break_move()
@@ -149,5 +175,7 @@ while True: # game main loop
         event_reader()
 
         uni_group.draw(second_screen)
+        wall_group.draw(second_screen)
+
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
