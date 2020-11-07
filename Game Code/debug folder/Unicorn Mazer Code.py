@@ -96,17 +96,27 @@ def event_reader(): # read and direct all screen events
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
+def wall_collide(): # check collide with the maze wall
+    if (pygame.sprite.groupcollide(uni_group, wall_group, False, False, pygame.sprite.collide_mask)):
+        print('COLLIDE')      
+
 class Unicorn(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.images = [pygame.image.load('big_uni_right.png').convert_alpha(),
-                       pygame.image.load('big_uni_left.png').convert_alpha()]
+        UNI_SIZE = (40,40)
+
+        self.images = [pygame.image.load('uni_right.png').convert_alpha(),
+                       pygame.image.load('uni_left.png').convert_alpha()]
+
+        self.images[0] = pygame.transform.scale(self.images[0], UNI_SIZE)
+        self.images[1] = pygame.transform.scale(self.images[1], UNI_SIZE)
 
         self.current_image = 0
 
-        self.image = pygame.image.load('big_uni_right.png').convert_alpha()
+        self.image = pygame.image.load('uni_right.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, UNI_SIZE)
         self.mask = pygame.mask.from_surface(self.image)
 
         self.rect = self.image.get_rect()
@@ -174,8 +184,11 @@ while True: # game main loop
 
         event_reader()
 
+        wall_collide()
+
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
+
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
