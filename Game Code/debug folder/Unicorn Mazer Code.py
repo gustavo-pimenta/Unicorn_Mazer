@@ -187,7 +187,6 @@ wall_group.add(wall)
 start_menu = True
 break_move()
 
-
 while True: # game main loop
 
     while start_menu:
