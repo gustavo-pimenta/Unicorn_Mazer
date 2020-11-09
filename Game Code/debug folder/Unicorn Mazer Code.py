@@ -105,8 +105,11 @@ def wall_collide(group): # check collide with the maze wall
 def check_itens(): # check if the unicorn get the stage itens
     if (pygame.sprite.groupcollide(uni_group, cup_group, False, True, pygame.sprite.collide_mask)):
         print('cupcake')
-    else: 
-        return False
+    else: pass
+
+    if (pygame.sprite.groupcollide(uni_group, cof_group, False, True, pygame.sprite.collide_mask)):
+        print('coffe')
+    else: pass
 
 class Unicorn(pygame.sprite.Sprite):
 
@@ -203,6 +206,26 @@ class Cup(pygame.sprite.Sprite):
         
         pass
 
+class Cof(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('cof.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (40,40))
+
+        COF_POS = (400,400)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = COF_POS[0]
+        self.rect[1] = COF_POS[1]
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self):
+        
+        pass
+
 uni_group = pygame.sprite.Group()
 uni = Unicorn()
 uni_group.add(uni)
@@ -214,6 +237,10 @@ wall_group.add(wall)
 cup_group = pygame.sprite.Group()
 cup = Cup()
 cup_group.add(cup)
+
+cof_group = pygame.sprite.Group()
+cof = Cof()
+cof_group.add(cof)
 
 start_menu = True
 break_move()
@@ -228,6 +255,7 @@ while True: # game main loop
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
         cup_group.draw(second_screen)
+        cof_group.draw(second_screen)
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
