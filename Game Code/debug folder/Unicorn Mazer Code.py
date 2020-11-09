@@ -35,6 +35,7 @@ height = 800 # initial height of the screen when the game opens
 screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
 second_screen = screen.copy() # create the second screen
 
+
 def num6dig(num): # always keep six numbers in the score 
     l = ['0','0','0','0','0','0']
     index = 6
@@ -45,6 +46,24 @@ def num6dig(num): # always keep six numbers in the score
     
         l.pop(0)
     return ''.join(l)
+
+def print_score(score): # print the score number in the screen aways with 6 numbers
+    l = ['0','0','0','0','0','0']
+    index = 6
+    while (score !=0):
+        l.insert(index, str(score%10))
+        score = score // 10
+        index -= 1
+    
+        l.pop(0)
+    text= ''.join(l)
+
+    font_default = pygame.font.get_default_font() # get the default pygame font
+    font = pygame.font.SysFont(font_default, 40) # set the font size
+    text = font.render(text, 1, white) # generate the score text
+    second_screen.blit(text, (15,40)) # draw the score number in the screen
+    font = pygame.font.SysFont(font_default, 35) # set the font size
+    second_screen.blit(font.render('SCORE:', 1, white), (15,15)) # draw the word "SCORE:"
 
 def erase(): # turn the whole main screen black
     black_screen = pygame.Surface((800,500))
@@ -103,12 +122,16 @@ def wall_collide(group): # check collide with the maze wall
         return False    
 
 def check_itens(): # check if the unicorn get the stage itens
+    global score
+    
     if (pygame.sprite.groupcollide(uni_group, cup_group, False, True, pygame.sprite.collide_mask)):
         print('cupcake')
+        score+=10000
     else: pass
 
     if (pygame.sprite.groupcollide(uni_group, cof_group, False, True, pygame.sprite.collide_mask)):
         print('coffe')
+        score+=1000
     else: pass
 
 class Unicorn(pygame.sprite.Sprite):
@@ -137,7 +160,7 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
 
-        SPEED = 2
+        SPEED = 5
 
         if moving_up == True: 
             self.rect[1] -= SPEED # move up 
@@ -243,6 +266,7 @@ cof = Cof()
 cof_group.add(cof)
 
 start_menu = True
+score = 0 # initial score
 break_move()
 
 while True: # game main loop
@@ -256,6 +280,8 @@ while True: # game main loop
         wall_group.draw(second_screen)
         cup_group.draw(second_screen)
         cof_group.draw(second_screen)
+        print_score(score)
+
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
