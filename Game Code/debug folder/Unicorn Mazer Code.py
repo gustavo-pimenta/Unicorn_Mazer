@@ -102,12 +102,19 @@ def wall_collide(group): # check collide with the maze wall
     else: 
         return False    
 
+def check_itens(): # check if the unicorn get the stage itens
+    if (pygame.sprite.groupcollide(uni_group, cup_group, False, False, pygame.sprite.collide_mask)):
+        print('cupcake')
+    else: 
+        return False
+
 class Unicorn(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
         UNI_SIZE = (40,40)
+        UNI_POS = (200,200)
 
         self.images = [pygame.image.load('uni_right.png').convert_alpha(),
                        pygame.image.load('uni_left.png').convert_alpha()]
@@ -122,8 +129,8 @@ class Unicorn(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
         self.rect = self.image.get_rect()
-        self.rect[0] = 30
-        self.rect[1] = 30
+        self.rect[0] = UNI_POS[0]
+        self.rect[1] = UNI_POS[1]
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
 
@@ -176,6 +183,26 @@ class Wall(pygame.sprite.Sprite):
         # self.rect[0] -= GAME_SPEED
         pass
 
+class Cup(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('cup.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (40,40))
+
+        CUP_POS = (300,300)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = CUP_POS[0]
+        self.rect[1] = CUP_POS[1]
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self):
+        
+        pass
+
 uni_group = pygame.sprite.Group()
 uni = Unicorn()
 uni_group.add(uni)
@@ -183,6 +210,10 @@ uni_group.add(uni)
 wall_group = pygame.sprite.Group()
 wall = Wall()
 wall_group.add(wall)
+
+cup_group = pygame.sprite.Group()
+cup = Cup()
+cup_group.add(cup)
 
 start_menu = True
 break_move()
@@ -197,6 +228,7 @@ while True: # game main loop
 
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
+        cup_group.draw(second_screen)
 
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
