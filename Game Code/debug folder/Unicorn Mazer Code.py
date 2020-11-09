@@ -103,7 +103,7 @@ def wall_collide(group): # check collide with the maze wall
         return False    
 
 def check_itens(): # check if the unicorn get the stage itens
-    if (pygame.sprite.groupcollide(uni_group, cup_group, False, False, pygame.sprite.collide_mask)):
+    if (pygame.sprite.groupcollide(uni_group, cup_group, False, True, pygame.sprite.collide_mask)):
         print('cupcake')
     else: 
         return False
@@ -223,13 +223,11 @@ while True: # game main loop
     while start_menu:
 
         event_reader()
-
-        
+        check_itens()
 
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
         cup_group.draw(second_screen)
-
 
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
