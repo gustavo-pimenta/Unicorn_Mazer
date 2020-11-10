@@ -3,8 +3,8 @@
 #   Version : 8.0                                                               #
 #                                                                               #            
 #   Made by:                                                                    #
-#       Gustavo Pimenta_____Developer / Coder                                   #
-#       Elayres Abreu_______Art director / Pixel Art Designer                   #
+#       Gustavo Pimenta - Developer / Coder / Pixel Art Designer                #
+#                                                                               #
 #                                                                               #          
 #################################################################################    
 
@@ -29,12 +29,18 @@ babby_blue =(173,216,230)
 brown = (150,75,0)
 wine = (94,33,41)
 
+# Game System
 pygame.init() # start pygame system
 width = 500 # initial width of the screen when the game opens
 height = 800 # initial height of the screen when the game opens
 screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
 second_screen = screen.copy() # create the second screen
 
+# Game Font
+font_default = pygame.font.get_default_font() # get the default pygame font
+font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
+font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
+font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
 
 def num6dig(num): # always keep six numbers in the score 
     l = ['0','0','0','0','0','0']
@@ -47,7 +53,9 @@ def num6dig(num): # always keep six numbers in the score
         l.pop(0)
     return ''.join(l)
 
-def print_score(score): # print the score number in the screen aways with 6 numbers
+def print_score(score): # print ranking and the score number in the screen aways with 6 numbers
+    
+    # turns the the score number into a 6 number list
     l = ['0','0','0','0','0','0']
     index = 6
     while (score !=0):
@@ -57,14 +65,25 @@ def print_score(score): # print the score number in the screen aways with 6 numb
     
         l.pop(0)
     text= ''.join(l)
-
-    font_default = pygame.font.get_default_font() # get the default pygame font
-    font = pygame.font.SysFont(font_default, 40) # set the font size
-    text = font.render(text, 1, white) # generate the score text
+    
+    text = font40.render(text, 1, white) # generate the score text
     second_screen.blit(text, (15,40)) # draw the score number in the screen
-    font = pygame.font.SysFont(font_default, 35) # set the font size
-    second_screen.blit(font.render('SCORE:', 1, white), (15,15)) # draw the word "SCORE:"
+    second_screen.blit(font35.render('SCORE:', 1, white), (15,15)) # draw the word "SCORE:"
 
+    with open('score.csv', 'r') as csv_file: # open the csv file
+        data = list(csv.reader(csv_file, delimiter=',')) # read the csv data
+        second_screen.blit(font35.render('RANKING:', 1, yellow), (15,120)) # draw the word "RANKING:"
+        second_screen.blit(font25.render((str(data[0][0])+'-'+str(data[0][1])), 1, yellow), (15,150)) # draw the best score
+        second_screen.blit(font25.render((str(data[1][0])+'-'+str(data[1][1])), 1, yellow), (15,170)) # draw the best score
+        second_screen.blit(font25.render((str(data[2][0])+'-'+str(data[2][1])), 1, yellow), (15,190)) # draw the best score
+        second_screen.blit(font25.render((str(data[3][0])+'-'+str(data[3][1])), 1, yellow), (15,210)) # draw the best score
+        second_screen.blit(font25.render((str(data[4][0])+'-'+str(data[4][1])), 1, yellow), (15,230)) # draw the best score
+    csv_file.close()
+
+def write_new_score(score): # write your score in the csv file
+    with open('score.csv', 'a') as csv_file: # open the csv file
+        pass
+    
 def erase(): # turn the whole main screen black
     black_screen = pygame.Surface((800,500))
     black_screen.fill(black)
@@ -134,13 +153,38 @@ def check_itens(): # check if the unicorn get the stage itens
         score+=1000
     else: pass
 
+def move_mobs():
+    global mob_speed
+
+    if mob_speed<=0:
+        bull_group.update()
+        mob_speed=100
+    else: mob_speed-=1
+
+def create_uni(UNI_SIZE, UNI_POS):
+    uni = Unicorn(UNI_SIZE, UNI_POS)
+    uni_group.add(uni)
+
+def create_bull(BULL_SIZE, BULL_POS):
+    bull = Bull(BULL_SIZE, BULL_POS)
+    bull_group.add(bull)
+
+def create_wall(wall_file):
+    wall = Wall(wall_file)
+    wall_group.add(wall)
+
+def create_cup(CUP_SIZE, CUP_POS):
+    cup = Cup(CUP_SIZE, CUP_POS)
+    cup_group.add(cup)
+
+def create_cof(COF_SIZE, COF_POS):
+    cof = Cof(COF_SIZE, COF_POS)
+    cof_group.add(cof)
+
 class Unicorn(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, UNI_SIZE, UNI_POS):
         pygame.sprite.Sprite.__init__(self)
-
-        UNI_SIZE = (40,40)
-        UNI_POS = (200,200)
 
         self.images = [pygame.image.load('uni_right.png').convert_alpha(),
                        pygame.image.load('uni_left.png').convert_alpha()]
@@ -160,7 +204,7 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
 
-        SPEED = 5
+        SPEED = 3
 
         if moving_up == True: 
             self.rect[1] -= SPEED # move up 
@@ -185,39 +229,94 @@ class Unicorn(pygame.sprite.Sprite):
     def bump(self):
         self.speed = -10
 
-class Wall(pygame.sprite.Sprite):
+class Bull(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, BULL_SIZE, BULL_POS):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load('wall.png').convert_alpha()
+        self.images = [pygame.image.load('bull.png').convert_alpha(),
+                       pygame.image.load('bull_2.png').convert_alpha(),
+                       pygame.image.load('bull_3.png').convert_alpha()]
+
+        self.images[0] = pygame.transform.scale(self.images[0], BULL_SIZE)
+        self.images[1] = pygame.transform.scale(self.images[1], BULL_SIZE)
+        self.images[2] = pygame.transform.scale(self.images[2], BULL_SIZE)
+
+        self.current_image = 0
+
+        self.image = pygame.image.load('bull.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, BULL_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = BULL_POS[0]
+        self.rect[1] = BULL_POS[1]
+
+    def update(self):
+        
+        BULL_SPEED = 15
+
+        # change between 3 sprites
+        self.current_image = (self.current_image + 1) % 3 
+        self.image = self.images[self.current_image]
+
+        # make the bull move
+        direction = randrange(1,5,1)
+        if direction==1: 
+            self.rect[0]+=BULL_SPEED
+            if wall_collide(bull_group)==True: self.rect[0]-=BULL_SPEED
+        elif direction==2: 
+            self.rect[0]-=BULL_SPEED
+            if wall_collide(bull_group)==True: self.rect[0]+=BULL_SPEED
+        elif direction==3: 
+            self.rect[1]+=BULL_SPEED
+            if wall_collide(bull_group)==True: self.rect[1]-=BULL_SPEED
+        elif direction==4: 
+            self.rect[1]-=BULL_SPEED
+            if wall_collide(bull_group)==True: self.rect[1]+=BULL_SPEED
+        
+        # moke the bull move avoiding walls, if the first move hit a wall
+        while wall_collide(bull_group) == True:
+            direction = randrange(1,5,1)
+            if direction==1: 
+                self.rect[0]+=BULL_SPEED
+                if wall_collide(bull_group)==True: self.rect[0]-=BULL_SPEED
+            elif direction==2: 
+                self.rect[0]-=BULL_SPEED
+                if wall_collide(bull_group)==True: self.rect[0]+=BULL_SPEED
+            elif direction==3: 
+                self.rect[1]+=BULL_SPEED
+                if wall_collide(bull_group)==True: self.rect[1]-=BULL_SPEED
+            elif direction==4: 
+                self.rect[1]-=BULL_SPEED
+                if wall_collide(bull_group)==True: self.rect[1]+=BULL_SPEED
+        
+        
+    
+    def bump(self):
+        self.speed = -10
+
+class Wall(pygame.sprite.Sprite):
+
+    def __init__(self, wall_file):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load(wall_file).convert_alpha()
         self.image = pygame.transform.scale(self.image, (500,500))
 
         self.rect = self.image.get_rect()
         self.rect[0] = 150
         self.rect[1] = 0
 
-        # if inverted:
-        #     self.image = pygame.transform.flip(self.image, False, True)
-        #     self.rect[1] = - (self.rect[3] - ysize)
-        # else:
-        #     self.rect[1] = SCREEN_HEIGHT - ysize
-
         self.mask = pygame.mask.from_surface(self.image)
-
-    def update(self):
-        # self.rect[0] -= GAME_SPEED
-        pass
 
 class Cup(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, CUP_SIZE, CUP_POS):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load('cup.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (40,40))
-
-        CUP_POS = (300,300)
+        self.image = pygame.transform.scale(self.image, CUP_SIZE)
 
         self.rect = self.image.get_rect()
         self.rect[0] = CUP_POS[0]
@@ -225,19 +324,13 @@ class Cup(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self):
-        
-        pass
-
 class Cof(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, COF_SIZE, COF_POS):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load('cof.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (40,40))
-
-        COF_POS = (400,400)
+        self.image = pygame.transform.scale(self.image, COF_SIZE)
 
         self.rect = self.image.get_rect()
         self.rect[0] = COF_POS[0]
@@ -245,41 +338,39 @@ class Cof(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self):
-        
-        pass
-
 uni_group = pygame.sprite.Group()
-uni = Unicorn()
-uni_group.add(uni)
-
+bull_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
-wall = Wall()
-wall_group.add(wall)
-
 cup_group = pygame.sprite.Group()
-cup = Cup()
-cup_group.add(cup)
-
 cof_group = pygame.sprite.Group()
-cof = Cof()
-cof_group.add(cof)
+
 
 start_menu = True
 score = 0 # initial score
+mob_speed = 10
 break_move()
 
 while True: # game main loop
+
+    create_uni((40,40),(300,300))
+    create_bull((40,40),(400,400))
+    create_cup((40,40),(100,300))
+    create_cof((40,40),(200,300))
+    create_wall('wall.png')
 
     while start_menu:
 
         event_reader()
         check_itens()
 
+        move_mobs()
+        
+
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
         cup_group.draw(second_screen)
         cof_group.draw(second_screen)
+        bull_group.draw(second_screen)
         print_score(score)
 
 
