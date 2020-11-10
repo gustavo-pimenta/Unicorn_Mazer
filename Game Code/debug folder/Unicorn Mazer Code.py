@@ -173,6 +173,10 @@ def create_wall(wall_file):
     wall = Wall(wall_file)
     wall_group.add(wall)
 
+def create_ground(ground_file):
+    ground = Wall(ground_file)
+    ground_group.add(ground)
+
 def create_cup(CUP_SIZE, CUP_POS):
     cup = Cup(CUP_SIZE, CUP_POS)
     cup_group.add(cup)
@@ -310,6 +314,20 @@ class Wall(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+class Ground(pygame.sprite.Sprite):
+
+    def __init__(self, ground_file):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load(ground_file).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (500,500))
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = 150
+        self.rect[1] = 0
+
+        self.mask = pygame.mask.from_surface(self.image)
+
 class Cup(pygame.sprite.Sprite):
 
     def __init__(self, CUP_SIZE, CUP_POS):
@@ -341,6 +359,7 @@ class Cof(pygame.sprite.Sprite):
 uni_group = pygame.sprite.Group()
 bull_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
+ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
 cof_group = pygame.sprite.Group()
 
@@ -357,6 +376,7 @@ while True: # game main loop
     create_cup((40,40),(100,300))
     create_cof((40,40),(200,300))
     create_wall('wall.png')
+    create_ground('ground3.png')
 
     while start_menu:
 
@@ -365,9 +385,10 @@ while True: # game main loop
 
         move_mobs()
         
-
+        ground_group.draw(second_screen)
         uni_group.draw(second_screen)
         wall_group.draw(second_screen)
+        
         cup_group.draw(second_screen)
         cof_group.draw(second_screen)
         bull_group.draw(second_screen)
