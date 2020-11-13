@@ -53,6 +53,10 @@ def num6dig(num): # always keep six numbers in the score
         l.pop(0)
     return ''.join(l)
 
+def screen_print(sprite_file, size, pos): # draw a image in the second screen
+    sprite = pygame.image.load(sprite_file)
+    second_screen.blit(pygame.transform.scale(sprite, size), pos)
+
 def print_score(score): # print ranking and the score number in the screen aways with 6 numbers
     
     # turns the the score number into a 6 number list
@@ -67,19 +71,44 @@ def print_score(score): # print ranking and the score number in the screen aways
     text= ''.join(l)
     
     text = font40.render(text, 1, white) # generate the score text
-    second_screen.blit(text, (15,40)) # draw the score number in the screen
-    second_screen.blit(font35.render('SCORE:', 1, white), (15,15)) # draw the word "SCORE:"
+    second_screen.blit(text, (15,95)) # draw the score number in the screen
+    second_screen.blit(font35.render('SCORE:', 1, white), (15,60)) # draw the word "SCORE:"
 
     with open('score.csv', 'r') as csv_file: # open the csv file
         data = list(csv.reader(csv_file, delimiter=',')) # read the csv data
-        second_screen.blit(font35.render('RANKING:', 1, yellow), (15,120)) # draw the word "RANKING:"
-        second_screen.blit(font25.render((str(data[0][0])+'-'+str(data[0][1])), 1, yellow), (15,150)) # draw the best score
-        second_screen.blit(font25.render((str(data[1][0])+'-'+str(data[1][1])), 1, yellow), (15,170)) # draw the best score
-        second_screen.blit(font25.render((str(data[2][0])+'-'+str(data[2][1])), 1, yellow), (15,190)) # draw the best score
-        second_screen.blit(font25.render((str(data[3][0])+'-'+str(data[3][1])), 1, yellow), (15,210)) # draw the best score
-        second_screen.blit(font25.render((str(data[4][0])+'-'+str(data[4][1])), 1, yellow), (15,230)) # draw the best score
+        second_screen.blit(font35.render('RANKING:', 1, yellow), (15,145)) # draw the word "RANKING:"
+        second_screen.blit(font25.render((str(data[0][0])+'-'+str(data[0][1])), 1, yellow), (15,175)) # draw the best score
+        second_screen.blit(font25.render((str(data[1][0])+'-'+str(data[1][1])), 1, yellow), (15,195)) # draw the best score
+        second_screen.blit(font25.render((str(data[2][0])+'-'+str(data[2][1])), 1, yellow), (15,215)) # draw the best score
+        second_screen.blit(font25.render((str(data[3][0])+'-'+str(data[3][1])), 1, yellow), (15,235)) # draw the best score
+        second_screen.blit(font25.render((str(data[4][0])+'-'+str(data[4][1])), 1, yellow), (15,255)) # draw the best score
     csv_file.close()
 
+def print_lifes(): # print the life hearts in the screen
+    global lifes
+
+    if lifes==0:
+        screen_print('heart_2.png', (45,45), (15,15))
+        screen_print('heart_2.png', (45,45), (55,15))
+        screen_print('heart_2.png', (45,45), (95,15))
+
+    if lifes==1:
+        screen_print('heart.png', (45,45), (15,15))
+        screen_print('heart_2.png', (45,45), (55,15))
+        screen_print('heart_2.png', (45,45), (95,15))
+    
+    if lifes==2:
+        screen_print('heart.png', (45,45), (15,15))
+        screen_print('heart.png', (45,45), (55,15))
+        screen_print('heart_2.png', (45,45), (95,15))
+    
+    if lifes>=3:
+        screen_print('heart.png', (45,45), (15,15))
+        screen_print('heart.png', (45,45), (55,15))
+        screen_print('heart.png', (45,45), (95,15))
+    
+    if lifes>3: lifes=3
+    
 def write_new_score(score): # write your score in the csv file
     with open('score.csv', 'a') as csv_file: # open the csv file
         pass
@@ -90,9 +119,6 @@ def erase(): # turn the whole main screen black
     second_screen.blit(black_screen,(0,0)) # erase the second screen
     screen.blit(black_screen,(0,0)) # erase the main screen 
     # pygame.display.flip()
-
-def screen_print(sprite, size, pos): # draw a image in the second screen
-    second_screen.blit(pygame.transform.scale(sprite, size), pos)
 
 def break_move(): # break all the movement off the unicorn to change stage
     global moving_up, moving_down, moving_left, moving_right
@@ -140,11 +166,19 @@ def wall_collide(group): # check collide with the maze wall
     else: 
         return False    
 
-def mob_collide(): # check if some mob kills the unicorn
+def mob_collide(): # check if some mob hits the unicorn
     if (pygame.sprite.groupcollide(uni_group, bull_group, True, False, pygame.sprite.collide_mask)):
-        pass
+        return True
     elif (pygame.sprite.groupcollide(uni_group, wolf_group, True, False, pygame.sprite.collide_mask)):
-        pass
+        return True
+    else: 
+        return False
+
+def check_death(): # check if the unicorn dies
+    global lifes 
+
+    if mob_collide()==True:
+        lifes-=1   
 
 def check_itens(): # check if the unicorn get the stage itens
     global score
@@ -454,6 +488,7 @@ cof_group = pygame.sprite.Group()
 start_menu = True
 score = 0 # initial score
 mob_speed = 10
+lifes = 3
 break_move()
 
 while True: # game main loop
@@ -472,7 +507,9 @@ while True: # game main loop
         check_itens()
 
         move_mobs()
-        mob_collide()
+        print_lifes()
+        check_death()
+        
         
         ground_group.draw(second_screen)
         uni_group.draw(second_screen)
