@@ -140,12 +140,6 @@ def wall_collide(group): # check collide with the maze wall
     else: 
         return False    
 
-def mob_collide(): # check if some mob kills the unicorn
-    if (pygame.sprite.groupcollide(uni_group, bull_group, True, False, pygame.sprite.collide_mask)):
-        pass
-    elif (pygame.sprite.groupcollide(uni_group, wolf_group, True, False, pygame.sprite.collide_mask)):
-        pass
-
 def check_itens(): # check if the unicorn get the stage itens
     global score
     
@@ -166,8 +160,7 @@ def move_mobs():
         bull_group.update()
         wolf_group.update()
         mob_speed=100
-        erase()
-    else: mob_speed-=1  
+    else: mob_speed-=1
 
 def create_uni(UNI_SIZE, UNI_POS):
     uni = Unicorn(UNI_SIZE, UNI_POS)
@@ -472,7 +465,6 @@ while True: # game main loop
         check_itens()
 
         move_mobs()
-        mob_collide()
         
         ground_group.draw(second_screen)
         uni_group.draw(second_screen)
