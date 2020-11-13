@@ -158,6 +158,7 @@ def move_mobs():
 
     if mob_speed<=0:
         bull_group.update()
+        wolf_group.update()
         mob_speed=100
     else: mob_speed-=1
 
@@ -168,6 +169,10 @@ def create_uni(UNI_SIZE, UNI_POS):
 def create_bull(BULL_SIZE, BULL_POS):
     bull = Bull(BULL_SIZE, BULL_POS)
     bull_group.add(bull)
+
+def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS):
+    wolf = Wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS)
+    wolf_group.add(wolf)
 
 def create_wall(wall_file):
     wall = Wall(wall_file)
@@ -300,6 +305,70 @@ class Bull(pygame.sprite.Sprite):
     def bump(self):
         self.speed = -10
 
+class Wolf(pygame.sprite.Sprite):
+
+    def __init__(self, WOLF_SIZE, WOLF_POS, WOLF_AXIS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load('wolf.png').convert_alpha(),
+                       pygame.image.load('wolf_2.png').convert_alpha()]
+
+        self.images[0] = pygame.transform.scale(self.images[0], WOLF_SIZE)
+        self.images[1] = pygame.transform.scale(self.images[1], WOLF_SIZE)
+
+        self.current_image = 0 
+
+        self.WOLF_AXIS = WOLF_AXIS # axis of the wolf movement
+        self.direction = '+' # initial deirection of the movement
+
+        self.image = pygame.image.load('bull.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, WOLF_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = WOLF_POS[0]
+        self.rect[1] = WOLF_POS[1]
+    
+    def update(self):
+        
+        # change between 2 sprites
+        if self.current_image==0: 
+            self.image = self.images[0]
+            self.current_image=1
+        else:
+            self.image = self.images[1]
+            self.current_image=0
+
+        WOLF_SPEED = 20
+
+        if self.WOLF_AXIS == 'X': # axis X movement
+
+            if self.direction=='+': # move to the right
+                self.rect[0]+=WOLF_SPEED
+                if wall_collide(wolf_group)==True: # wall collide change direction
+                    self.rect[0]-=WOLF_SPEED
+                    self.direction='-'
+
+            if self.direction=='-': # move to the left
+                self.rect[0]-=WOLF_SPEED
+                if wall_collide(wolf_group)==True: # wall collide change direction
+                    self.rect[0]+=WOLF_SPEED
+                    self.direction='+'
+        
+        if self.WOLF_AXIS == 'Y': # axis Y movement
+
+            if self.direction=='+': # move down
+                self.rect[1]+=WOLF_SPEED
+                if wall_collide(wolf_group)==True: # wall collide change direction
+                    self.rect[1]-=WOLF_SPEED
+                    self.direction='-'
+
+            if self.direction=='-': # move up
+                self.rect[1]-=WOLF_SPEED
+                if wall_collide(wolf_group)==True: # wall collide change direction
+                    self.rect[1]+=WOLF_SPEED
+                    self.direction='+'
+
 class Wall(pygame.sprite.Sprite):
 
     def __init__(self, wall_file):
@@ -358,6 +427,7 @@ class Cof(pygame.sprite.Sprite):
 
 uni_group = pygame.sprite.Group()
 bull_group = pygame.sprite.Group()
+wolf_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
@@ -373,10 +443,11 @@ while True: # game main loop
 
     create_uni((40,40),(300,300))
     create_bull((40,40),(400,400))
+    create_wolf((40,40),(450,400),'Y')
     create_cup((40,40),(100,300))
     create_cof((40,40),(200,300))
     create_wall('wall.png')
-    create_ground('ground3.png')
+    # create_ground('ground3.png')
 
     while start_menu:
 
@@ -392,6 +463,7 @@ while True: # game main loop
         cup_group.draw(second_screen)
         cof_group.draw(second_screen)
         bull_group.draw(second_screen)
+        wolf_group.draw(second_screen)
         print_score(score)
 
 
