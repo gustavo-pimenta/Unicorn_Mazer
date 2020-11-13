@@ -57,8 +57,9 @@ def screen_print(sprite_file, size, pos): # draw a image in the second screen
     sprite = pygame.image.load(sprite_file)
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
 
-def print_score(score): # print ranking and the score number in the screen aways with 6 numbers
-    
+def print_score(): # print ranking and the score number in the screen aways with 6 numbers
+    global score
+
     # turns the the score number into a 6 number list
     l = ['0','0','0','0','0','0']
     index = 6
@@ -167,18 +168,19 @@ def wall_collide(group): # check collide with the maze wall
         return False    
 
 def mob_collide(): # check if some mob hits the unicorn
-    if (pygame.sprite.groupcollide(uni_group, bull_group, True, False, pygame.sprite.collide_mask)):
+    if (pygame.sprite.groupcollide(uni_group, bull_group, False, False, pygame.sprite.collide_mask)):
         return True
-    elif (pygame.sprite.groupcollide(uni_group, wolf_group, True, False, pygame.sprite.collide_mask)):
+    elif (pygame.sprite.groupcollide(uni_group, wolf_group, False, False, pygame.sprite.collide_mask)):
         return True
     else: 
         return False
 
 def check_death(): # check if the unicorn dies
-    global lifes 
+    global lifes, dead
 
     if mob_collide()==True:
         lifes-=1   
+        dead=True
 
 def check_itens(): # check if the unicorn get the stage itens
     global score
@@ -200,7 +202,6 @@ def move_mobs():
         bull_group.update()
         wolf_group.update()
         mob_speed=100
-        erase()
     else: mob_speed-=1  
 
 def create_uni(UNI_SIZE, UNI_POS):
@@ -230,6 +231,31 @@ def create_cup(CUP_SIZE, CUP_POS):
 def create_cof(COF_SIZE, COF_POS):
     cof = Cof(COF_SIZE, COF_POS)
     cof_group.add(cof)
+
+def clear_groups(): # clear all sprites in all groups
+    uni_group.empty()
+    bull_group.empty()
+    wolf_group.empty()
+    wall_group.empty()
+    ground_group.empty()
+    cup_group.empty()
+    cof_group.empty()
+
+def default_functions(): # run all the deafult functions to make the game run
+    event_reader()
+    check_itens()
+    move_mobs()
+    check_death()
+    uni_group.draw(second_screen)
+    wall_group.draw(second_screen)
+    cup_group.draw(second_screen)
+    cof_group.draw(second_screen)
+    bull_group.draw(second_screen)
+    wolf_group.draw(second_screen)
+    print_score()
+    print_lifes()
+    screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
+    pygame.display.flip() # update screen
 
 class Unicorn(pygame.sprite.Sprite):
 
@@ -484,8 +510,8 @@ ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
 cof_group = pygame.sprite.Group()
 
-
 start_menu = True
+dead = False
 score = 0 # initial score
 mob_speed = 10
 lifes = 3
@@ -496,31 +522,16 @@ while True: # game main loop
     create_uni((40,40),(300,300))
     create_bull((40,40),(400,400))
     create_wolf((40,40),(450,400),'X')
-    create_cup((40,40),(100,300))
+    create_cup((40,40),(250,300))
     create_cof((40,40),(200,300))
     create_wall('wall.png')
-    # create_ground('ground3.png')
-
+    
     while start_menu:
 
-        event_reader()
-        check_itens()
+        default_functions()
 
-        move_mobs()
-        print_lifes()
-        check_death()
-        
-        
-        ground_group.draw(second_screen)
-        uni_group.draw(second_screen)
-        wall_group.draw(second_screen)
-        
-        cup_group.draw(second_screen)
-        cof_group.draw(second_screen)
-        bull_group.draw(second_screen)
-        wolf_group.draw(second_screen)
-        print_score(score)
+        while dead==True:
+            pass
 
 
-        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
-        pygame.display.flip() # update screen
+        
