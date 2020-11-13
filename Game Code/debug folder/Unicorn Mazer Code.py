@@ -527,7 +527,7 @@ while True: # game main loop
     create_wall('wall.png')
     
     while start_menu:
-
+        
         default_functions()
 
         while dead==True:
