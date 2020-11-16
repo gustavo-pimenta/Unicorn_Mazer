@@ -234,6 +234,7 @@ def move_mobs():
     if mob_speed<=0:
         bull_group.update()
         wolf_group.update()
+        boss_group.update()
         update_screen=True
         mob_speed=100
     else: mob_speed-=1  
@@ -249,6 +250,10 @@ def create_bull(BULL_SIZE, BULL_POS):
 def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS):
     wolf = Wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS)
     wolf_group.add(wolf)
+
+def create_boss():
+    boss = Boss()
+    boss_group.add(boss)
 
 def create_wall(wall_file):
     wall = Wall(wall_file)
@@ -293,12 +298,12 @@ def default_functions(): # run all the deafult functions to make the game run
         cof_group.draw(second_screen)
         bull_group.draw(second_screen)
         wolf_group.draw(second_screen)
+        boss_group.draw(second_screen)
         print_score()
         print_lifes()
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
         pygame.display.flip() # update screen
         
-
 class Unicorn(pygame.sprite.Sprite):
 
     def __init__(self, UNI_SIZE, UNI_POS):
@@ -484,6 +489,55 @@ class Wolf(pygame.sprite.Sprite):
                     self.rect[1]+=WOLF_SPEED
                     self.direction='+'
 
+class Boss(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load('boss.png').convert_alpha(),
+                       pygame.image.load('boss_2.png').convert_alpha()]
+
+        BOSS_SIZE = (350,400)
+        BOSS_POS = (250,100)
+
+        self.images[0] = pygame.transform.scale(self.images[0], BOSS_SIZE)
+        self.images[1] = pygame.transform.scale(self.images[1], BOSS_SIZE)
+
+        self.current_image = 0 
+        self.direction = '+' # initial direction
+
+        self.image = pygame.image.load('boss.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, BOSS_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = BOSS_POS[0]
+        self.rect[1] = BOSS_POS[1]
+    
+    def update(self):
+        
+        # change between 2 sprites
+        if self.current_image<=1: self.image = self.images[0]
+        elif self.current_image>1: self.image = self.images[1]
+        if self.current_image==0: self.current_image=3
+        elif self.current_image>0: self.current_image-=1        
+            
+            
+
+        BOSS_SPEED = 30
+        
+        if self.direction=='+': # move down
+            self.rect[1]+=BOSS_SPEED
+            if wall_collide(boss_group)==True: # wall collide change direction
+                self.rect[1]-=BOSS_SPEED
+                self.direction='-'
+
+        if self.direction=='-': # move up
+            self.rect[1]-=BOSS_SPEED
+            if wall_collide(boss_group)==True: # wall collide change direction
+                self.rect[1]+=BOSS_SPEED
+                self.direction='+'
+
 class Wall(pygame.sprite.Sprite):
 
     def __init__(self, wall_file):
@@ -543,6 +597,7 @@ class Cof(pygame.sprite.Sprite):
 uni_group = pygame.sprite.Group()
 bull_group = pygame.sprite.Group()
 wolf_group = pygame.sprite.Group()
+boss_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
@@ -559,10 +614,11 @@ break_move()
 while True: # game main loop
 
     create_uni((40,40),(300,300))
-    create_bull((40,40),(400,400))
-    create_wolf((40,40),(450,400),'X')
-    create_cup((40,40),(250,300))
-    create_cof((40,40),(200,300))
+    create_boss()
+    # create_bull((40,40),(400,400))
+    # create_wolf((40,40),(450,400),'X')
+    # create_cup((40,40),(250,300))
+    # create_cof((40,40),(200,300))
     create_wall('wall.png')
     
     while start_menu:
