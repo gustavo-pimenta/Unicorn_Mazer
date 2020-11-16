@@ -157,9 +157,6 @@ def event_reader2(): # read ALL screen events HIGH PROCESSING CPU
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True
         elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
-    
-    try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
-    except: print('ALERT: MOVING ERROR')
 
 def event_reader(): # read events using WAIT function 
     global moving_up, moving_down, moving_left, moving_right, height, width
@@ -180,15 +177,15 @@ def event_reader(): # read events using WAIT function
         print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
     # check the keyboard arrows press and release to movement
-    if event.type == pygame.KEYDOWN and event.key == pygame.K_UP: moving_up = True
-    elif event.type == pygame.KEYUP and event.key == pygame.K_UP: moving_up = False
-    if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN: moving_down = True
-    elif event.type == pygame.KEYUP and event.key == pygame.K_DOWN: moving_down = False
-    if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT: moving_right = True
-    elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT: moving_right = False
-    if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_UP: moving_up = True   
+    elif event.type == pygame.KEYUP and event.key == pygame.K_UP: moving_up = False       
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN: moving_down = True       
+    elif event.type == pygame.KEYUP and event.key == pygame.K_DOWN: moving_down = False        
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT: moving_right = True       
+    elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT: moving_right = False      
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True      
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
-    
+        
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
         return True
@@ -224,16 +221,20 @@ def check_itens(): # check if the unicorn get the stage itens
     else: pass
 
 def move_uni():
-    global moving_up, moving_down, moving_left, moving_right
+    global moving_up, moving_down, moving_left, moving_right, update_screen
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
+    if moving_up==True or moving_down==True or moving_right==True or moving_left==True:
+        update_screen = True
+
 def move_mobs():
-    global mob_speed
+    global mob_speed, update_screen
 
     if mob_speed<=0:
         bull_group.update()
         wolf_group.update()
+        update_screen=True
         mob_speed=100
     else: mob_speed-=1  
 
@@ -275,25 +276,28 @@ def clear_groups(): # clear all sprites in all groups
     cof_group.empty()
 
 def default_functions(): # run all the deafult functions to make the game run
+    global update_screen
 
     event_reader()
-
-    move_uni()
     move_mobs()
-
+    move_uni()
     check_death()
     check_itens()
 
-    uni_group.draw(second_screen)
-    wall_group.draw(second_screen)
-    cup_group.draw(second_screen)
-    cof_group.draw(second_screen)
-    bull_group.draw(second_screen)
-    wolf_group.draw(second_screen)
-    print_score()
-    print_lifes()
-    screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
-    pygame.display.flip() # update screen
+    if update_screen == True:
+        update_screen=False
+        erase()
+        uni_group.draw(second_screen)
+        wall_group.draw(second_screen)
+        cup_group.draw(second_screen)
+        cof_group.draw(second_screen)
+        bull_group.draw(second_screen)
+        wolf_group.draw(second_screen)
+        print_score()
+        print_lifes()
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
+        pygame.display.flip() # update screen
+        
 
 class Unicorn(pygame.sprite.Sprite):
 
@@ -338,10 +342,6 @@ class Unicorn(pygame.sprite.Sprite):
             self.image = self.images[0] # change sprite
             if wall_collide(uni_group)==True:
                 self.rect[0] -= SPEED # undo the move if hit a wall
-        erase()
-    
-    def bump(self):
-        self.speed = -10
 
 class Bull(pygame.sprite.Sprite):
 
@@ -550,7 +550,7 @@ cof_group = pygame.sprite.Group()
 
 start_menu = True
 dead = False
-freeze = False
+update_screen = False
 score = 0 # initial score
 mob_speed = 10
 lifes = 3
