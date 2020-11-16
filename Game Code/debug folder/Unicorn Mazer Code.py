@@ -128,12 +128,12 @@ def break_move(): # break all the movement off the unicorn to change stage
     moving_left = False
     moving_right = False
 
-def event_reader(): # read and direct all screen events 
+def event_reader2(): # read ALL screen events HIGH PROCESSING CPU 
     
     global moving_up, moving_down, moving_left, moving_right, height, width
 
     for event in pygame.event.get():
-        
+    
         if event.type == QUIT: pygame.display.quit() # when the player close the game
 
         elif event.type == VIDEORESIZE: # when the player resize the window
@@ -157,10 +157,38 @@ def event_reader(): # read and direct all screen events
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True
         elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
-
+    
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
+def event_reader(): # read events using WAIT function 
+    global moving_up, moving_down, moving_left, moving_right, height, width
+
+    event = pygame.event.wait(timeout=10)
+    
+    if event.type == pygame.NOEVENT: return # break function if NO EVENT
+
+    if event.type == QUIT: pygame.display.quit() # when the player close the game
+
+    elif event.type == VIDEORESIZE: # when the player resize the window
+        
+        new_size = event.dict['size'] # get the new size
+        new_size = list(new_size) # turns the tuple into a list
+        new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+        height, width = new_size # update vars with the new size value
+        screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+        print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+    # check the keyboard arrows press and release to movement
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_UP: moving_up = True
+    elif event.type == pygame.KEYUP and event.key == pygame.K_UP: moving_up = False
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN: moving_down = True
+    elif event.type == pygame.KEYUP and event.key == pygame.K_DOWN: moving_down = False
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT: moving_right = True
+    elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT: moving_right = False
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True
+    elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
+    
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
         return True
@@ -194,6 +222,11 @@ def check_itens(): # check if the unicorn get the stage itens
         print('coffe')
         score+=1000
     else: pass
+
+def move_uni():
+    global moving_up, moving_down, moving_left, moving_right
+    try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
+    except: print('ALERT: MOVING ERROR')
 
 def move_mobs():
     global mob_speed
@@ -242,10 +275,15 @@ def clear_groups(): # clear all sprites in all groups
     cof_group.empty()
 
 def default_functions(): # run all the deafult functions to make the game run
+
     event_reader()
-    check_itens()
+
+    move_uni()
     move_mobs()
+
     check_death()
+    check_itens()
+
     uni_group.draw(second_screen)
     wall_group.draw(second_screen)
     cup_group.draw(second_screen)
@@ -392,7 +430,7 @@ class Wolf(pygame.sprite.Sprite):
         self.WOLF_AXIS = WOLF_AXIS # axis of the wolf movement
         self.direction = '+' # initial deirection of the movement
 
-        self.image = pygame.image.load('bull.png').convert_alpha()
+        self.image = pygame.image.load('wolf.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, WOLF_SIZE)
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -512,6 +550,7 @@ cof_group = pygame.sprite.Group()
 
 start_menu = True
 dead = False
+freeze = False
 score = 0 # initial score
 mob_speed = 10
 lifes = 3
