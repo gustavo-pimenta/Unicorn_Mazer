@@ -43,6 +43,17 @@ font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
 font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
 font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
 
+def num6dig(num):
+    l = ['0','0','0','0','0','0']
+    index = 6
+    while (num !=0):
+        l.insert(index, str(num%10))
+        num = num // 10
+        index -= 1
+    
+        l.pop(0)
+    return ''.join(l)
+
 def screen_print(sprite_file, size, pos): # draw a image in the second screen
     sprite = pygame.image.load(sprite_file)
     second_screen.blit(pygame.transform.scale(sprite, size), pos)
@@ -61,6 +72,7 @@ def print_score(): # print ranking and the score number in the screen aways with
         l.pop(0)
     text= ''.join(l)
     
+    score=int(text)
     text = font40.render(text, 1, white) # generate the score text
     second_screen.blit(text, (15,95)) # draw the score number in the screen
     second_screen.blit(font35.render('SCORE:', 1, white), (15,60)) # draw the word "SCORE:"
@@ -100,9 +112,29 @@ def print_lifes(): # print the life hearts in the screen
     
     if lifes>3: lifes=3
     
-def write_new_score(score): # write your score in the csv file
-    with open('score.csv', 'a') as csv_file: # open the csv file
-        pass
+def write_new_score(score_text): # write your score in the csv file
+    global score
+
+    score_list=[]
+    with open('score.csv', 'r') as csv_file: # open the csv file with the ranking
+        data = list(csv.reader(csv_file, delimiter=',')) # read the csv data
+    csv_file.close()
+
+    new_line=([score_text,(str(num6dig(score)))]) # new line with the new score
+    
+    # check if the score is bigger than the score ranking and add it in the right place
+    if new_line[1] > data[0][1]: data.insert(0,new_line) 
+    elif new_line[1] > data[1][1]: data.insert(1,new_line)
+    elif new_line[1] > data[2][1]: data.insert(2,new_line)
+    elif new_line[1] > data[3][1]: data.insert(3,new_line)
+    elif new_line[1] > data[4][1]: data.insert(4,new_line)
+    elif new_line[1] > data[5][1]: data.insert(5,new_line)
+    elif new_line[1] > data[6][1]: data.insert(6,new_line)
+    elif new_line[1] > data[7][1]: data.insert(7,new_line)
+    
+    with open('score.csv', 'w') as csv_file: # open the csv file
+        for i in data:
+            csv_file.write(str(i[0])+','+str(i[1])+'\n')
     
 def erase(): # turn the whole main screen black
     black_screen = pygame.Surface((800,500))
@@ -177,7 +209,7 @@ def event_reader(): # read events using WAIT function
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
 def death_screen_event_reader():
-    global height, width, dead
+    global height, width, dead, score_text
 
     event = pygame.event.wait(timeout=600)
 
@@ -193,47 +225,12 @@ def death_screen_event_reader():
         print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
     elif event.type == pygame.KEYDOWN:
-        if event.unicode.isalpha():
+        if event.unicode.isalpha() and len(score_text)<=2:
             score_text += event.unicode
         elif event.key == K_BACKSPACE:
-            host = host[:-1]
-        elif event.key == K_RETURN: #ENTER
-            # host = ""
-            inserir_ip=True
-            host_doc = open('score_text.txt', 'w')
-            host_doc.write('BLINKS-'+host)
-            host_doc.close()
-            
-
-        elif event.key == pygame.K_0:
-            host=host+'0'
-        elif event.key == pygame.K_1:
-            host=host+'1'
-        elif event.key == pygame.K_2:
-            host=host+'2'
-        elif event.key == pygame.K_3:
-            host=host+'3'
-        elif event.key == pygame.K_4:
-            host=host+'4'
-        elif event.key == pygame.K_5:
-            host=host+'5'
-        elif event.key == pygame.K_6:
-            host=host+'6'
-        elif event.key == pygame.K_7:
-            host=host+'7'
-        elif event.key == pygame.K_8:
-            host=host+'8'
-        elif event.key == pygame.K_9:
-            host=host+'9'
-        elif event.key == pygame.K_PERIOD:
-            host=host+'.'
-        elif event.key == pygame.K_MINUS:
-            host=host+'-'
-        elif event.key == pygame.K_UNDERSCORE:
-            host=host+'_'
-    
-    
-                            
+            score_text = score_text[:-1]
+        elif event.key == K_RETURN: # ENTER key pressed
+            write_new_score(score_text)                       
 
 def hurt_screen_event_reader(): # read all screen events in the death screen
     global height, width, hurt
@@ -276,7 +273,7 @@ def mob_collide(): # check if some mob hits the unicorn
         return False
 
 def check_death(): # check if the unicorn dies
-    global lifes, dead, hurt
+    global lifes, dead, hurt, score, score_text
 
     if mob_collide()==True:
         lifes-=1   
@@ -299,16 +296,20 @@ def check_death(): # check if the unicorn dies
             screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
             pygame.display.flip() # update screen
 
+        score_text=''
         while dead: # dead screen
+            
             
             erase()
             death_screen_event_reader()
             screen_print('dead.png', (280,280), (300,40))
             second_screen.blit(font50.render('GAME OVER', 1, red), (300,350))
-            if aux==0:
-                second_screen.blit(font50.render('PRESS ANY KEY TO CONTINUE', 1, red), (190,410))
-                aux+=1
-            else: aux=0
+            
+            second_screen.blit(font35.render('INSERT YOU TAG:', 1, yellow), (190,420))
+            second_screen.blit(font50.render(score_text, 1, yellow), (420,410))
+            second_screen.blit(font50.render(('- '+str(num6dig(score))), 1, yellow), (500,410))
+                
+            
             print_score()
             print_lifes()
             screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
@@ -819,9 +820,10 @@ start_menu = True
 hurt = False
 dead = False
 update_screen = False
-score = 0 # initial score
+score = 900 # initial score
 mob_speed = 10
 lifes = 3
+score_text=''
 break_move()
 
 while True: # game main loop
