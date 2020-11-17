@@ -264,6 +264,10 @@ def create_slime():
     slime = Slime()
     slime_group.add(slime)
 
+def create_runa(RUNA_POS):
+    runa = Runa(RUNA_POS)
+    runa_group.add(runa)
+
 def create_wall(wall_file):
     wall = Wall(wall_file)
     wall_group.add(wall)
@@ -308,6 +312,7 @@ def default_functions(): # run all the deafult functions to make the game run
         bull_group.draw(second_screen)
         wolf_group.draw(second_screen)
         slime_group.draw(second_screen)
+        runa_group.draw(second_screen)
         boss_group.draw(second_screen)
         print_score()
         print_lifes()
@@ -539,6 +544,7 @@ class Boss(pygame.sprite.Sprite):
                 if wall_collide(boss_group)==True: # wall collide change direction
                     self.rect[1]-=BOSS_SPEED
                     self.direction='-'
+                    create_runa((380,430))
                     create_slime()
                     create_slime()
                     create_slime()
@@ -550,6 +556,7 @@ class Boss(pygame.sprite.Sprite):
                 if wall_collide(boss_group)==True: # wall collide change direction
                     self.rect[1]+=BOSS_SPEED
                     self.direction='+'
+                    create_runa((380,40))
                     create_slime()
                     create_slime()
                     create_slime()
@@ -595,6 +602,33 @@ class Slime(pygame.sprite.Sprite):
         elif 10<self.time<=13: self.image = self.images[2]
         elif 13<self.time<=15: self.image = self.images[1]
         elif 15<self.time: self.kill() # kill the slime after the time passed
+
+class Runa(pygame.sprite.Sprite):
+
+    def __init__(self, RUNA_POS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load('runa.png').convert_alpha()]
+
+        RUNA_SIZE = (40,40)
+
+        self.images[0] = pygame.transform.scale(self.images[0], RUNA_SIZE)
+
+        self.current_image = 0
+        self.time = 0 # time to the slime grow and vanish
+
+        self.image = pygame.image.load('runa.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, RUNA_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = RUNA_POS[0]
+        self.rect[1] = RUNA_POS[1]
+
+    def update(self):
+        
+        self.time+=1
+        if 3<self.time: self.kill() # kill after the time passed
 
 class Wall(pygame.sprite.Sprite):
 
@@ -657,6 +691,7 @@ bull_group = pygame.sprite.Group()
 wolf_group = pygame.sprite.Group()
 boss_group = pygame.sprite.Group()
 slime_group = pygame.sprite.Group()
+runa_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
