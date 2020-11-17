@@ -38,20 +38,10 @@ second_screen = screen.copy() # create the second screen
 
 # Game Font
 font_default = pygame.font.get_default_font() # get the default pygame font
+font50 = pygame.font.SysFont(font_default, 50) # set the font size to use later
 font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
 font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
 font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
-
-def num6dig(num): # always keep six numbers in the score 
-    l = ['0','0','0','0','0','0']
-    index = 6
-    while (num !=0):
-        l.insert(index, str(num%10))
-        num = num // 10
-        index -= 1
-    
-        l.pop(0)
-    return ''.join(l)
 
 def screen_print(sprite_file, size, pos): # draw a image in the second screen
     sprite = pygame.image.load(sprite_file)
@@ -128,7 +118,7 @@ def break_move(): # break all the movement off the unicorn to change stage
     moving_left = False
     moving_right = False
 
-def event_reader2(): # read ALL screen events HIGH PROCESSING CPU 
+def event_reader_old(): # read ALL screen events HIGH PROCESSING CPU 
     
     global moving_up, moving_down, moving_left, moving_right, height, width
 
@@ -185,7 +175,27 @@ def event_reader(): # read events using WAIT function
     elif event.type == pygame.KEYUP and event.key == pygame.K_RIGHT: moving_right = False      
     if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True      
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
+
+def death_screen_event_reader(): # read all screen events in the death screen
+    global height, width, hurt, dead
+
+    event = pygame.event.wait(timeout=600)
+
+    if event.type == QUIT: pygame.display.quit() # when the player close the game
+
+    elif event.type == VIDEORESIZE: # when the player resize the window
         
+        new_size = event.dict['size'] # get the new size
+        new_size = list(new_size) # turns the tuple into a list
+        new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+        height, width = new_size # update vars with the new size value
+        screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+        print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+    elif event.type == pygame.KEYDOWN:
+        hurt=False
+        dead=False
+
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
         return True
@@ -208,11 +218,43 @@ def mob_collide(): # check if some mob hits the unicorn
         return False
 
 def check_death(): # check if the unicorn dies
-    global lifes, dead
+    global lifes, dead, hurt
 
     if mob_collide()==True:
         lifes-=1   
-        dead=True
+        if lifes>0: hurt=True
+        else: dead=True
+        
+        aux=0
+        while hurt: # hurted screen
+            
+            erase()
+            death_screen_event_reader()
+            screen_print('hurt.png', (280,280), (340,40))
+            second_screen.blit(font50.render('YOU JUST HURTED YOURSELF', 1, white), (200,350))
+            if aux==0:
+                second_screen.blit(font50.render('PRESS ANY KEY TO CONTINUE', 1, yellow), (190,410))
+                aux+=1
+            else: aux=0
+            print_score()
+            print_lifes()
+            screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
+            pygame.display.flip() # update screen
+
+        while dead: # dead screen
+            
+            erase()
+            death_screen_event_reader()
+            screen_print('dead.png', (280,280), (300,40))
+            second_screen.blit(font50.render('GAME OVER', 1, red), (300,350))
+            if aux==0:
+                second_screen.blit(font50.render('PRESS ANY KEY TO CONTINUE', 1, red), (190,410))
+                aux+=1
+            else: aux=0
+            print_score()
+            print_lifes()
+            screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
+            pygame.display.flip() # update screen
 
 def check_itens(): # check if the unicorn get the stage itens
     global score
@@ -716,6 +758,7 @@ cup_group = pygame.sprite.Group()
 cof_group = pygame.sprite.Group()
 
 start_menu = True
+hurt = False
 dead = False
 update_screen = False
 score = 0 # initial score
