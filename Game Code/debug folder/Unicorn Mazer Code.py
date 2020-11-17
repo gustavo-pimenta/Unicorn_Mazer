@@ -197,6 +197,10 @@ def mob_collide(): # check if some mob hits the unicorn
         return True
     elif (pygame.sprite.groupcollide(uni_group, wolf_group, False, False, pygame.sprite.collide_mask)):
         return True
+    elif (pygame.sprite.groupcollide(uni_group, boss_group, False, False, pygame.sprite.collide_mask)):
+        return True
+    elif (pygame.sprite.groupcollide(uni_group, slime_group, False, False, pygame.sprite.collide_mask)):
+        return True
     else: 
         return False
 
@@ -235,6 +239,7 @@ def move_mobs():
         bull_group.update()
         wolf_group.update()
         boss_group.update()
+        slime_group.update()
         update_screen=True
         mob_speed=100
     else: mob_speed-=1  
@@ -254,6 +259,10 @@ def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS):
 def create_boss():
     boss = Boss()
     boss_group.add(boss)
+
+def create_slime():
+    slime = Slime()
+    slime_group.add(slime)
 
 def create_wall(wall_file):
     wall = Wall(wall_file)
@@ -298,6 +307,7 @@ def default_functions(): # run all the deafult functions to make the game run
         cof_group.draw(second_screen)
         bull_group.draw(second_screen)
         wolf_group.draw(second_screen)
+        slime_group.draw(second_screen)
         boss_group.draw(second_screen)
         print_score()
         print_lifes()
@@ -409,11 +419,6 @@ class Bull(pygame.sprite.Sprite):
             elif direction==4: 
                 self.rect[1]-=BULL_SPEED
                 if wall_collide(bull_group)==True: self.rect[1]+=BULL_SPEED
-        
-        
-    
-    def bump(self):
-        self.speed = -10
 
 class Wolf(pygame.sprite.Sprite):
 
@@ -495,16 +500,19 @@ class Boss(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.images = [pygame.image.load('boss.png').convert_alpha(),
-                       pygame.image.load('boss_2.png').convert_alpha()]
+                       pygame.image.load('boss_2.png').convert_alpha(),
+                       pygame.image.load('boss_3.png').convert_alpha()]
 
         BOSS_SIZE = (350,400)
-        BOSS_POS = (250,100)
+        BOSS_POS = (240,0)
 
         self.images[0] = pygame.transform.scale(self.images[0], BOSS_SIZE)
         self.images[1] = pygame.transform.scale(self.images[1], BOSS_SIZE)
+        self.images[2] = pygame.transform.scale(self.images[2], BOSS_SIZE)
 
         self.current_image = 0 
         self.direction = '+' # initial direction
+        self.lifes = 3
 
         self.image = pygame.image.load('boss.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, BOSS_SIZE)
@@ -516,27 +524,77 @@ class Boss(pygame.sprite.Sprite):
     
     def update(self):
         
-        # change between 2 sprites
-        if self.current_image<=1: self.image = self.images[0]
-        elif self.current_image>1: self.image = self.images[1]
-        if self.current_image==0: self.current_image=3
-        elif self.current_image>0: self.current_image-=1        
+        # change between 3 sprites
+        if self.lifes<=0: self.image = self.images[2] # dead sprite
+        else:
+            if self.current_image<=1: self.image = self.images[0] # closed mouth sprite
+            elif self.current_image>1: self.image = self.images[1] # open mouth sprite
+            if self.current_image==0: self.current_image=3
+            elif self.current_image>0: self.current_image-=1        
             
+            BOSS_SPEED = 30
             
-
-        BOSS_SPEED = 30
-        
-        if self.direction=='+': # move down
-            self.rect[1]+=BOSS_SPEED
-            if wall_collide(boss_group)==True: # wall collide change direction
-                self.rect[1]-=BOSS_SPEED
-                self.direction='-'
-
-        if self.direction=='-': # move up
-            self.rect[1]-=BOSS_SPEED
-            if wall_collide(boss_group)==True: # wall collide change direction
+            if self.direction=='+': # move down
                 self.rect[1]+=BOSS_SPEED
-                self.direction='+'
+                if wall_collide(boss_group)==True: # wall collide change direction
+                    self.rect[1]-=BOSS_SPEED
+                    self.direction='-'
+                    create_slime()
+                    create_slime()
+                    create_slime()
+                    create_slime()
+                    create_slime()
+
+            if self.direction=='-': # move up
+                self.rect[1]-=BOSS_SPEED
+                if wall_collide(boss_group)==True: # wall collide change direction
+                    self.rect[1]+=BOSS_SPEED
+                    self.direction='+'
+                    create_slime()
+                    create_slime()
+                    create_slime()
+                    create_slime()
+                    create_slime()
+
+class Slime(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load('slime.png').convert_alpha(),
+                       pygame.image.load('slime_2.png').convert_alpha(),
+                       pygame.image.load('slime_3.png').convert_alpha(),
+                       pygame.image.load('slime_4.png').convert_alpha()]
+
+        SLIME_SIZE = (40,40)
+        SLIME_POS = ((randrange(170,600,20)),(randrange(50,450,20)))
+
+        self.images[0] = pygame.transform.scale(self.images[0], SLIME_SIZE)
+        self.images[1] = pygame.transform.scale(self.images[1], SLIME_SIZE)
+        self.images[2] = pygame.transform.scale(self.images[2], SLIME_SIZE)
+        self.images[3] = pygame.transform.scale(self.images[3], SLIME_SIZE)
+
+        self.current_image = 0
+        self.time = 0 # time to the slime grow and vanish
+
+        self.image = pygame.image.load('slime.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, SLIME_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = SLIME_POS[0]
+        self.rect[1] = SLIME_POS[1]
+
+    def update(self):
+        
+        self.time+=1
+
+        if self.time<=3: self.image = self.images[1]
+        elif 3<self.time<=5: self.image = self.images[2]
+        elif 5<self.time<=10: self.image = self.images[3]
+        elif 10<self.time<=13: self.image = self.images[2]
+        elif 13<self.time<=15: self.image = self.images[1]
+        elif 15<self.time: self.kill() # kill the slime after the time passed
 
 class Wall(pygame.sprite.Sprite):
 
@@ -598,6 +656,7 @@ uni_group = pygame.sprite.Group()
 bull_group = pygame.sprite.Group()
 wolf_group = pygame.sprite.Group()
 boss_group = pygame.sprite.Group()
+slime_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 ground_group = pygame.sprite.Group()
 cup_group = pygame.sprite.Group()
@@ -615,6 +674,7 @@ while True: # game main loop
 
     create_uni((40,40),(300,300))
     create_boss()
+    
     # create_bull((40,40),(400,400))
     # create_wolf((40,40),(450,400),'X')
     # create_cup((40,40),(250,300))
