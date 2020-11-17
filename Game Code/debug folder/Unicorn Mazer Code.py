@@ -201,6 +201,9 @@ def mob_collide(): # check if some mob hits the unicorn
         return True
     elif (pygame.sprite.groupcollide(uni_group, slime_group, False, False, pygame.sprite.collide_mask)):
         return True
+    elif (pygame.sprite.groupcollide(uni_group, runa_group, False, True, pygame.sprite.collide_mask)):     
+        for boss in boss_group:
+            boss.boss_damage()
     else: 
         return False
 
@@ -240,6 +243,7 @@ def move_mobs():
         wolf_group.update()
         boss_group.update()
         slime_group.update()
+        runa_group.update()
         update_screen=True
         mob_speed=100
     else: mob_speed-=1  
@@ -259,6 +263,7 @@ def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS):
 def create_boss():
     boss = Boss()
     boss_group.add(boss)
+    return boss # return the boss object for use later in the boss_damage function
 
 def create_slime():
     slime = Slime()
@@ -506,7 +511,8 @@ class Boss(pygame.sprite.Sprite):
 
         self.images = [pygame.image.load('boss.png').convert_alpha(),
                        pygame.image.load('boss_2.png').convert_alpha(),
-                       pygame.image.load('boss_3.png').convert_alpha()]
+                       pygame.image.load('boss_3.png').convert_alpha(),
+                       pygame.image.load('boss_4.png').convert_alpha()]
 
         BOSS_SIZE = (350,400)
         BOSS_POS = (240,0)
@@ -514,10 +520,11 @@ class Boss(pygame.sprite.Sprite):
         self.images[0] = pygame.transform.scale(self.images[0], BOSS_SIZE)
         self.images[1] = pygame.transform.scale(self.images[1], BOSS_SIZE)
         self.images[2] = pygame.transform.scale(self.images[2], BOSS_SIZE)
+        self.images[3] = pygame.transform.scale(self.images[3], BOSS_SIZE)
 
         self.current_image = 0 
         self.direction = '+' # initial direction
-        self.lifes = 3
+        self.lifes = 5
 
         self.image = pygame.image.load('boss.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, BOSS_SIZE)
@@ -527,6 +534,12 @@ class Boss(pygame.sprite.Sprite):
         self.rect[0] = BOSS_POS[0]
         self.rect[1] = BOSS_POS[1]
     
+    def boss_damage(self):
+        print('boss lifes = ', self.lifes)
+        self.lifes-=1 # life damage
+        self.image = self.images[3] # damaged sprite 
+        
+
     def update(self):
         
         # change between 3 sprites
@@ -562,7 +575,7 @@ class Boss(pygame.sprite.Sprite):
                     create_slime()
                     create_slime()
                     create_slime()
-
+            
 class Slime(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -591,6 +604,11 @@ class Slime(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect[0] = SLIME_POS[0]
         self.rect[1] = SLIME_POS[1]
+
+        while (pygame.sprite.groupcollide(uni_group, slime_group, False, False, pygame.sprite.collide_mask)==True):
+            SLIME_POS = ((randrange(170,600,20)),(randrange(50,450,20)))
+            self.rect[0] = SLIME_POS[0]
+            self.rect[1] = SLIME_POS[1]
 
     def update(self):
         
@@ -719,6 +737,8 @@ while True: # game main loop
     while start_menu:
         
         default_functions()
+
+        
 
         while dead==True:
             pass
