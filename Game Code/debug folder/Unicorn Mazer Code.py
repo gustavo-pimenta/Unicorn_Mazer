@@ -230,7 +230,25 @@ def death_screen_event_reader():
         elif event.key == K_BACKSPACE:
             score_text = score_text[:-1]
         elif event.key == K_RETURN: # ENTER key pressed
-            write_new_score(score_text)                       
+            write_new_score(score_text)  
+            dead=False  
+
+        # KEEP ALL LETTERS AWAYS CAPSLOCK
+        if event.key == pygame.K_a:
+            score_text = score_text[:-1]
+            score_text=score_text+'A'
+        elif event.key == pygame.K_b:
+            score_text = score_text[:-1]
+            score_text=score_text+'B' 
+        elif event.key == pygame.K_c:
+            score_text = score_text[:-1]
+            score_text=score_text+'C'  
+        elif event.key == pygame.K_d:
+            score_text = score_text[:-1]
+            score_text=score_text+'D'      
+        elif event.key == pygame.K_e:
+            score_text = score_text[:-1]
+            score_text=score_text+'E'                
 
 def hurt_screen_event_reader(): # read all screen events in the death screen
     global height, width, hurt
@@ -275,14 +293,13 @@ def mob_collide(): # check if some mob hits the unicorn
 def check_death(): # check if the unicorn dies
     global lifes, dead, hurt, score, score_text
 
-    if mob_collide()==True:
+    if mob_collide()==True: # check if some mob collide with unicorn
         lifes-=1   
-        if lifes>0: hurt=True
-        else: dead=True
+        if lifes>0: hurt=True # hurt loses a heart
+        else: dead=True # dead is game over
         
-        aux=0
+        aux=0 
         while hurt: # hurted screen
-            
             erase()
             hurt_screen_event_reader()
             screen_print('hurt.png', (280,280), (340,40))
@@ -298,18 +315,13 @@ def check_death(): # check if the unicorn dies
 
         score_text=''
         while dead: # dead screen
-            
-            
             erase()
             death_screen_event_reader()
             screen_print('dead.png', (280,280), (300,40))
             second_screen.blit(font50.render('GAME OVER', 1, red), (300,350))
-            
             second_screen.blit(font35.render('INSERT YOU TAG:', 1, yellow), (190,420))
             second_screen.blit(font50.render(score_text, 1, yellow), (420,410))
             second_screen.blit(font50.render(('- '+str(num6dig(score))), 1, yellow), (500,410))
-                
-            
             print_score()
             print_lifes()
             screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen itens into the main screen
@@ -820,7 +832,7 @@ start_menu = True
 hurt = False
 dead = False
 update_screen = False
-score = 900 # initial score
+score = 99999 # initial score
 mob_speed = 10
 lifes = 3
 score_text=''
@@ -840,8 +852,6 @@ while True: # game main loop
     while start_menu:
         
         default_functions()
-
-        
 
         while dead==True:
             pass
