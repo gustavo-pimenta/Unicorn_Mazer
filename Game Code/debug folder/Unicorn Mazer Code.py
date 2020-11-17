@@ -176,8 +176,67 @@ def event_reader(): # read events using WAIT function
     if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT: moving_left = True      
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
-def death_screen_event_reader(): # read all screen events in the death screen
-    global height, width, hurt, dead
+def death_screen_event_reader():
+    global height, width, dead
+
+    event = pygame.event.wait(timeout=600)
+
+    if event.type == QUIT: pygame.display.quit() # when the player close the game
+
+    elif event.type == VIDEORESIZE: # when the player resize the window
+        
+        new_size = event.dict['size'] # get the new size
+        new_size = list(new_size) # turns the tuple into a list
+        new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+        height, width = new_size # update vars with the new size value
+        screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+        print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+    elif event.type == pygame.KEYDOWN:
+        if event.unicode.isalpha():
+            score_text += event.unicode
+        elif event.key == K_BACKSPACE:
+            host = host[:-1]
+        elif event.key == K_RETURN: #ENTER
+            # host = ""
+            inserir_ip=True
+            host_doc = open('score_text.txt', 'w')
+            host_doc.write('BLINKS-'+host)
+            host_doc.close()
+            
+
+        elif event.key == pygame.K_0:
+            host=host+'0'
+        elif event.key == pygame.K_1:
+            host=host+'1'
+        elif event.key == pygame.K_2:
+            host=host+'2'
+        elif event.key == pygame.K_3:
+            host=host+'3'
+        elif event.key == pygame.K_4:
+            host=host+'4'
+        elif event.key == pygame.K_5:
+            host=host+'5'
+        elif event.key == pygame.K_6:
+            host=host+'6'
+        elif event.key == pygame.K_7:
+            host=host+'7'
+        elif event.key == pygame.K_8:
+            host=host+'8'
+        elif event.key == pygame.K_9:
+            host=host+'9'
+        elif event.key == pygame.K_PERIOD:
+            host=host+'.'
+        elif event.key == pygame.K_MINUS:
+            host=host+'-'
+        elif event.key == pygame.K_UNDERSCORE:
+            host=host+'_'
+    
+    
+                            
+
+def hurt_screen_event_reader(): # read all screen events in the death screen
+    global height, width, hurt
 
     event = pygame.event.wait(timeout=600)
 
@@ -194,7 +253,6 @@ def death_screen_event_reader(): # read all screen events in the death screen
 
     elif event.type == pygame.KEYDOWN:
         hurt=False
-        dead=False
 
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
@@ -229,7 +287,7 @@ def check_death(): # check if the unicorn dies
         while hurt: # hurted screen
             
             erase()
-            death_screen_event_reader()
+            hurt_screen_event_reader()
             screen_print('hurt.png', (280,280), (340,40))
             second_screen.blit(font50.render('YOU JUST HURTED YOURSELF', 1, white), (200,350))
             if aux==0:
