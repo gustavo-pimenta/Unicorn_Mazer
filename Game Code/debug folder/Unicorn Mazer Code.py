@@ -853,8 +853,7 @@ while True: # game main loop
         
         default_functions()
 
-        while dead==True:
-            pass
+        
 
 
         
