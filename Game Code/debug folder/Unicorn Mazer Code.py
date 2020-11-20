@@ -373,11 +373,11 @@ class Runa(pygame.sprite.Sprite):
 
 class Wall(pygame.sprite.Sprite):
 
-    def __init__(self, wall_file):
+    def __init__(self, wall_file, WALL_SIZE):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load(wall_file).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (500,500))
+        self.image = pygame.transform.scale(self.image, (WALL_SIZE))
 
         self.rect = self.image.get_rect()
         self.rect[0] = 150
@@ -429,6 +429,8 @@ class Cof(pygame.sprite.Sprite):
 
 
 def num6dig(num):
+    if num<0: num=0 # avoid negative score
+
     l = ['0','0','0','0','0','0']
     index = 6
     while (num !=0):
@@ -445,6 +447,8 @@ def screen_print(sprite_file, size, pos): # draw a image in the second screen
 
 def print_score(): # print ranking and the score number in the screen aways with 6 numbers
     global score
+
+    if score<0: score=0 # avoid negative score
 
     # turns the the score number into a 6 number list
     l = ['0','0','0','0','0','0']
@@ -594,7 +598,7 @@ def event_reader(): # read events using WAIT function
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
 def death_screen_event_reader():
-    global height, width, dead, score_text
+    global height, width, dead, score_text, maze
 
     event = pygame.event.wait(timeout=600)
 
@@ -615,7 +619,8 @@ def death_screen_event_reader():
         elif event.key == K_BACKSPACE:
             score_text = score_text[:-1]
         elif event.key == K_RETURN: # ENTER key pressed
-            write_new_score(score_text)  
+            write_new_score(score_text) 
+            maze=0 
             dead=False  
 
         # KEEP ALL LETTERS AWAYS CAPSLOCK
@@ -652,6 +657,7 @@ def hurt_screen_event_reader(): # read all screen events in the death screen
         print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
     elif event.type == pygame.KEYDOWN:
+        reset_stage()
         hurt=False
 
 def wall_collide(group): # check collide with the maze wall
@@ -679,7 +685,8 @@ def check_death(): # check if the unicorn dies
     global lifes, dead, hurt, score, score_text
 
     if mob_collide()==True: # check if some mob collide with unicorn
-        lifes-=1   
+        lifes-=1 
+        score-=7000  
         if lifes>0: hurt=True # hurt loses a heart
         else: dead=True # dead is game over
         
@@ -760,7 +767,7 @@ def move_mobs():
         slime_group.update()
         runa_group.update()
         update_screen=True
-        mob_speed=100
+        mob_speed=70
     else: mob_speed-=1  
 
 def create_uni(UNI_SIZE, UNI_POS):
@@ -789,8 +796,8 @@ def create_runa(RUNA_POS):
     runa = Runa(RUNA_POS)
     runa_group.add(runa)
 
-def create_wall(wall_file):
-    wall = Wall(wall_file)
+def create_wall(wall_file, WALL_SIZE):
+    wall = Wall(wall_file, WALL_SIZE)
     wall_group.add(wall)
 
 def create_ground(ground_file):
@@ -840,6 +847,53 @@ def reset_items(): # reset the collectable items of the game
     create_cup((22,22),(352,102),1)
     create_cof((22,22),(402,426),1)
     create_cof((22,22),(376,426),1)
+
+def reset_stage(): # place unicorn and all mobs in the initial place of the stage
+    global maze
+
+    if maze==1: 
+        break_move()
+        clear_groups()
+        erase()
+        create_uni((22, 22),(388, 18))
+        create_wolf((22,22),(501,106),'Y')
+        create_wolf((22,22),(276,226),'Y')
+        create_wolf((22,22),(392,274),'X')
+        create_bull((22,22),(392,354))
+        create_wall('maze_1.png', (500,500)) 
+        
+    elif maze==2: 
+        break_move()
+        clear_groups()
+        erase()
+        create_uni((22, 22),(750, 400))
+        create_wall('maze_2.png', (650, 500)) 
+    
+    elif maze==3: 
+        break_move()
+        clear_groups()
+        erase()
+        create_uni((22, 22),(452, 460))
+        create_wolf((22,22),(180,136),'X')
+        create_wolf((22,22),(180,332),'X')
+        create_wolf((22,22),(452,136),'X')
+        create_wolf((22,22),(452,332),'X')
+        create_wolf((22,22),(746,136),'X')
+        create_wolf((22,22),(746,332),'X')
+        create_wall('maze_3.png', (650, 500))  
+    
+    # elif maze==4: 
+    # elif maze==5: 
+    # elif maze==6: 
+    # elif maze==7: 
+    # elif maze==8:
+    # elif maze==9:
+    # elif maze==10: 
+    # elif maze==11: 
+    # elif maze==12:
+    # elif maze==13: 
+    # elif maze==14: 
+    # elif maze==15: 
 
 def print_items(): # draw the collectable iten from each maze in the screen
     global maze
@@ -945,7 +999,7 @@ while True: # game main loop
         update_screen = False # var that controls how many times the screen be updated
         uni_pos=[0,0] # global unicorn position to move between stages
         score = 0 # initial score
-        mob_speed = 10 # this var control the speed of all mobs in the game
+        mob_speed = 70 # this var control the speed of all mobs in the game, (lower number = higher speed)
         lifes = 1 # initial unicorn lifes
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
@@ -953,16 +1007,22 @@ while True: # game main loop
         maze=1
 
     if maze==1:
-        break_move()
-        clear_groups()
-        erase()
-        create_uni((22, 22),(388, 18))
-        create_wolf((22,22),(501,106),'Y')
-        create_wolf((22,22),(276,226),'Y')
-        create_bull((22,22),(392,354))
-        create_wall('maze_1.png')       
+        reset_stage()
     while maze==1:    
-        if uni_pos[1]<0: maze=7
+        if uni_pos[1]<0: maze=3
+        default_functions()
+
+    if maze==2:
+        reset_stage()
+    while maze==2:    
+        if uni_pos[0]>800: maze=3
+        default_functions()
+
+    if maze==3:
+        reset_stage()     
+    while maze==3:    
+        if uni_pos[1]>500: maze=1
+        elif uni_pos[0]<150: maze=2
         default_functions()
         
 
@@ -971,7 +1031,7 @@ while True: # game main loop
         clear_groups()
         erase()
         create_uni((10, 10),(160,250))
-        create_wall('maze_7.png')
+        create_wall('maze_7.png', (500,500))
     while maze==7:
         if uni_pos[0]<150: maze=1
         default_functions()
