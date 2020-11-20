@@ -14,6 +14,20 @@ import pygame.mixer
 import time, random, sys, csv
 from random import randrange
 
+# Game System
+pygame.init() # start pygame system
+width = 500 # initial width of the screen when the game opens
+height = 800 # initial height of the screen when the game opens
+screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
+second_screen = screen.copy() # create the second screen
+
+# Game Text Font
+font_default = pygame.font.get_default_font() # get the default pygame font
+font50 = pygame.font.SysFont(font_default, 50) # set the font size to use later
+font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
+font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
+font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
+
 # Game Colors
 black = (0,0,0)
 white = (255,255,255)
@@ -28,20 +42,6 @@ salmon = (250,127,117)
 babby_blue =(173,216,230)
 brown = (150,75,0)
 wine = (94,33,41)
-
-# Game System
-pygame.init() # start pygame system
-width = 500 # initial width of the screen when the game opens
-height = 800 # initial height of the screen when the game opens
-screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
-second_screen = screen.copy() # create the second screen
-
-# Game Font
-font_default = pygame.font.get_default_font() # get the default pygame font
-font50 = pygame.font.SysFont(font_default, 50) # set the font size to use later
-font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
-font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
-font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
 
 class Unicorn(pygame.sprite.Sprite):
 
