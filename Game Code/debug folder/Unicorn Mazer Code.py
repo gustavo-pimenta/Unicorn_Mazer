@@ -962,11 +962,7 @@ while True: # game main loop
         create_bull((22,22),(392,354))
         create_wall('maze_1.png')       
     while maze==1:    
-        if uni_pos[1]<0:
-            maze=7
-            
-        print(uni_pos)
-
+        if uni_pos[1]<0: maze=7
         default_functions()
         
 
@@ -977,9 +973,7 @@ while True: # game main loop
         create_uni((10, 10),(160,250))
         create_wall('maze_7.png')
     while maze==7:
-        if uni_pos[0]<150:
-            maze=1
-            
+        if uni_pos[0]<150: maze=1
         default_functions()
         print(uni_pos)
             
