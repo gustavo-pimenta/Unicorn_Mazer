@@ -926,8 +926,6 @@ def default_functions(): # run all the deafult functions to make the game run
     event_reader()
     move_mobs()
     move_uni()
-    check_death()
-    check_items()
 
     if update_screen == True:
         update_screen=False
@@ -944,7 +942,10 @@ def default_functions(): # run all the deafult functions to make the game run
         print_lifes()
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
         pygame.display.flip() # update screen
-        
+
+    check_death()
+    check_items()
+     
 uni_group = pygame.sprite.Group() # create unicorn sprite group
 bull_group = pygame.sprite.Group() # create bull sprite group
 wolf_group = pygame.sprite.Group() # create wolf sprite group
@@ -988,6 +989,7 @@ cof_group_15 = pygame.sprite.Group()
 
 
 maze = 0 # var that control the game stage, maze 0 is the start menu
+last_maze = 0 # keep the last maze, to control change between stages
 
 while True: # game main loop
     
