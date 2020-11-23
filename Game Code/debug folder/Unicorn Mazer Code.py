@@ -843,18 +843,24 @@ def create_cof(COF_SIZE, COF_POS, MAZE):
     elif MAZE==15: cof_group_15.add(cof)
 
 def reset_items(): # reset the collectable items of the game
-    create_cup((22,22),(424,102),1)
-    create_cup((22,22),(352,102),1)
-    create_cof((22,22),(402,426),1)
-    create_cof((22,22),(376,426),1)
+    # maze 1 items
+    create_cup((20,20),(424,102),1)
+    create_cup((20,20),(352,102),1)
+    create_cof((20,20),(402,426),1)
+    create_cof((20,20),(376,426),1)
+    # maze 2 items
+    create_cup((20,20),(326,205),2)
+    create_cup((20,20),(450,425),2)
+    create_cup((20,20),(652,128),2)
 
 def reset_stage(): # place unicorn and all mobs in the initial place of the stage
-    global maze
+    global maze, last_maze, item_sprite_group
 
     if maze==1: 
+        erase()
         break_move()
         clear_groups()
-        erase()
+        item_sprite_group=1
         create_uni((22, 22),(388, 18))
         create_wolf((22,22),(501,106),'Y')
         create_wolf((22,22),(276,226),'Y')
@@ -863,17 +869,18 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         create_wall('maze_1.png', (500,500)) 
         
     elif maze==2: 
+        erase()
         break_move()
         clear_groups()
-        erase()
+        item_sprite_group=2
         create_uni((22, 22),(750, 400))
         create_wall('maze_2.png', (650, 500)) 
     
     elif maze==3: 
+        erase()
         break_move()
         clear_groups()
-        erase()
-        create_uni((22, 22),(452, 460))
+        item_sprite_group=3
         create_wolf((22,22),(180,136),'X')
         create_wolf((22,22),(180,332),'X')
         create_wolf((22,22),(452,136),'X')
@@ -881,6 +888,8 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         create_wolf((22,22),(746,136),'X')
         create_wolf((22,22),(746,332),'X')
         create_wall('maze_3.png', (650, 500))  
+        if last_maze==1: create_uni((22, 22),(452, 460))
+        elif last_maze==2: create_uni((22, 22),(176, 224))
     
     # elif maze==4: 
     # elif maze==5: 
@@ -896,23 +905,23 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
     # elif maze==15: 
 
 def print_items(): # draw the collectable iten from each maze in the screen
-    global maze
+    global item_sprite_group
 
-    if maze==1: cup_group_1.draw(second_screen), cof_group_1.draw(second_screen)
-    elif maze==2: cup_group_2.draw(second_screen), cof_group_2.draw(second_screen)
-    elif maze==3: cup_group_3.draw(second_screen), cof_group_3.draw(second_screen)
-    elif maze==4: cup_group_4.draw(second_screen), cof_group_4.draw(second_screen)
-    elif maze==5: cup_group_5.draw(second_screen), cof_group_5.draw(second_screen)
-    elif maze==6: cup_group_6.draw(second_screen), cof_group_6.draw(second_screen)
-    elif maze==7: cup_group_7.draw(second_screen), cof_group_7.draw(second_screen)
-    elif maze==8: cup_group_8.draw(second_screen), cof_group_8.draw(second_screen)
-    elif maze==9: cup_group_9.draw(second_screen), cof_group_9.draw(second_screen)
-    elif maze==10: cup_group_10.draw(second_screen), cof_group_10.draw(second_screen)
-    elif maze==11: cup_group_11.draw(second_screen), cof_group_11.draw(second_screen)
-    elif maze==12: cup_group_12.draw(second_screen), cof_group_12.draw(second_screen)
-    elif maze==13: cup_group_13.draw(second_screen), cof_group_13.draw(second_screen)
-    elif maze==14: cup_group_14.draw(second_screen), cof_group_14.draw(second_screen)
-    elif maze==15: cup_group_15.draw(second_screen), cof_group_15.draw(second_screen)
+    if item_sprite_group==1: cup_group_1.draw(second_screen), cof_group_1.draw(second_screen)
+    elif item_sprite_group==2: cup_group_2.draw(second_screen), cof_group_2.draw(second_screen)
+    elif item_sprite_group==3: cup_group_3.draw(second_screen), cof_group_3.draw(second_screen)
+    elif item_sprite_group==4: cup_group_4.draw(second_screen), cof_group_4.draw(second_screen)
+    elif item_sprite_group==5: cup_group_5.draw(second_screen), cof_group_5.draw(second_screen)
+    elif item_sprite_group==6: cup_group_6.draw(second_screen), cof_group_6.draw(second_screen)
+    elif item_sprite_group==7: cup_group_7.draw(second_screen), cof_group_7.draw(second_screen)
+    elif item_sprite_group==8: cup_group_8.draw(second_screen), cof_group_8.draw(second_screen)
+    elif item_sprite_group==9: cup_group_9.draw(second_screen), cof_group_9.draw(second_screen)
+    elif item_sprite_group==10: cup_group_10.draw(second_screen), cof_group_10.draw(second_screen)
+    elif item_sprite_group==11: cup_group_11.draw(second_screen), cof_group_11.draw(second_screen)
+    elif item_sprite_group==12: cup_group_12.draw(second_screen), cof_group_12.draw(second_screen)
+    elif item_sprite_group==13: cup_group_13.draw(second_screen), cof_group_13.draw(second_screen)
+    elif item_sprite_group==14: cup_group_14.draw(second_screen), cof_group_14.draw(second_screen)
+    elif item_sprite_group==15: cup_group_15.draw(second_screen), cof_group_15.draw(second_screen)
 
 def clear_groups(): # clear all sprites in all groups, except for the collectable items groups
     uni_group.empty()
@@ -1007,25 +1016,37 @@ while True: # game main loop
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
         maze=1
+        item_sprite_group=1 # sprite group of the colletable items of each stage
 
     if maze==1:
         reset_stage()
     while maze==1:    
-        if uni_pos[1]<0: maze=3
+        if uni_pos[1]<0: 
+            maze=3
+            last_maze=1
+            update_screen=False
         default_functions()
 
     if maze==2:
         reset_stage()
     while maze==2:    
-        if uni_pos[0]>800: maze=3
+        if uni_pos[0]>800: 
+            maze=3
+            last_maze=2
+            update_screen=False
         default_functions()
+        print(uni_pos)
 
     if maze==3:
         reset_stage()     
     while maze==3:    
-        if uni_pos[1]>500: maze=1
+        if uni_pos[1]>500: 
+            maze=1
+            last_maze=3
+            update_screen=False
         elif uni_pos[0]<150: maze=2
         default_functions()
+        print(uni_pos)
         
 
     if maze==7:
@@ -1035,7 +1056,9 @@ while True: # game main loop
         create_uni((10, 10),(160,250))
         create_wall('maze_7.png', (500,500))
     while maze==7:
-        if uni_pos[0]<150: maze=1
+        if uni_pos[0]<150: 
+            maze=1
+            last_maze=1
         default_functions()
         print(uni_pos)
             
