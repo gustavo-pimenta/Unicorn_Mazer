@@ -786,6 +786,60 @@ def check_items(): # check if the unicorn get the stage items
             lifes+=1
         else: pass
 
+    # elif maze==2:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_2, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_2, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+    
+    # elif maze==3:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+    
+    # elif maze==4:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_4, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_4, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+    
+    # elif maze==5:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_5, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_5, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+    
+    # elif maze==6:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_6, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_6, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+
+    # elif maze==7:
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_7, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     else: pass
+    #     if (pygame.sprite.groupcollide(uni_group, cof_group_7, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
+    #     else: pass
+
 def move_uni():
     global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
