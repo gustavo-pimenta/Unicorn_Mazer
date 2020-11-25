@@ -427,6 +427,19 @@ class Cof(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+class Key(pygame.sprite.Sprite):
+
+    def __init__(self, KEY_SIZE, KEY_POS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('key_3.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, KEY_SIZE)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = KEY_POS[0]
+        self.rect[1] = KEY_POS[1]
+
+        self.mask = pygame.mask.from_surface(self.image)
 
 def num6dig(num):
     if num<0: num=0 # avoid negative score
@@ -463,43 +476,89 @@ def print_score(): # print ranking and the score number in the screen aways with
     
     score=int(text)
     text = font40.render(text, 1, white) # generate the score text
-    second_screen.blit(text, (15,95)) # draw the score number in the screen
-    second_screen.blit(font35.render('SCORE:', 1, white), (15,60)) # draw the word "SCORE:"
+    second_screen.blit(text, (15,230)) # draw the score number in the screen
+    second_screen.blit(font35.render('SCORE:', 1, white), (15,200)) # draw the word "SCORE:"
 
     with open('score.csv', 'r') as csv_file: # open the csv file
         data = list(csv.reader(csv_file, delimiter=',')) # read the csv data
-        second_screen.blit(font35.render('RANKING:', 1, yellow), (15,145)) # draw the word "RANKING:"
-        second_screen.blit(font25.render((str(data[0][0])+'-'+str(data[0][1])), 1, yellow), (15,175)) # draw the best score
-        second_screen.blit(font25.render((str(data[1][0])+'-'+str(data[1][1])), 1, yellow), (15,195)) # draw the best score
-        second_screen.blit(font25.render((str(data[2][0])+'-'+str(data[2][1])), 1, yellow), (15,215)) # draw the best score
-        second_screen.blit(font25.render((str(data[3][0])+'-'+str(data[3][1])), 1, yellow), (15,235)) # draw the best score
-        second_screen.blit(font25.render((str(data[4][0])+'-'+str(data[4][1])), 1, yellow), (15,255)) # draw the best score
+        second_screen.blit(font35.render('RANKING:', 1, yellow), (15,20)) # draw the word "RANKING:"
+        second_screen.blit(font25.render((str(data[0][0])+'-'+str(data[0][1])), 1, yellow), (15,50)) # draw the best score
+        second_screen.blit(font25.render((str(data[1][0])+'-'+str(data[1][1])), 1, yellow), (15,70)) # draw the best score
+        second_screen.blit(font25.render((str(data[2][0])+'-'+str(data[2][1])), 1, yellow), (15,90)) # draw the best score
+        second_screen.blit(font25.render((str(data[3][0])+'-'+str(data[3][1])), 1, yellow), (15,110)) # draw the best score
+        second_screen.blit(font25.render((str(data[4][0])+'-'+str(data[4][1])), 1, yellow), (15,130)) # draw the best score
     csv_file.close()
 
 def print_lifes(): # print the life hearts in the screen
     global lifes
 
     if lifes==0:
-        screen_print('heart_2.png', (45,45), (15,15))
-        screen_print('heart_2.png', (45,45), (55,15))
-        screen_print('heart_2.png', (45,45), (95,15))
+        screen_print('heart_2.png', (45,45), (15,300))
+        screen_print('heart_2.png', (45,45), (55,300))
+        screen_print('heart_2.png', (45,45), (95,300))
 
     if lifes==1:
-        screen_print('heart.png', (45,45), (15,15))
-        screen_print('heart_2.png', (45,45), (55,15))
-        screen_print('heart_2.png', (45,45), (95,15))
+        screen_print('heart.png', (45,45), (15,300))
+        screen_print('heart_2.png', (45,45), (55,300))
+        screen_print('heart_2.png', (45,45), (95,300))
     
     if lifes==2:
-        screen_print('heart.png', (45,45), (15,15))
-        screen_print('heart.png', (45,45), (55,15))
-        screen_print('heart_2.png', (45,45), (95,15))
+        screen_print('heart.png', (45,45), (15,300))
+        screen_print('heart.png', (45,45), (55,300))
+        screen_print('heart_2.png', (45,45), (95,300))
     
     if lifes>=3:
-        screen_print('heart.png', (45,45), (15,15))
-        screen_print('heart.png', (45,45), (55,15))
-        screen_print('heart.png', (45,45), (95,15))
+        screen_print('heart.png', (45,45), (15,300))
+        screen_print('heart.png', (45,45), (55,300))
+        screen_print('heart.png', (45,45), (95,300))
     
     if lifes>3: lifes=3
+
+def print_key(): # print the keys in the side menu
+    global key
+
+    if key==0:
+        screen_print('key_2.png', (45,45), (15,355))
+        screen_print('key_2.png', (45,45), (55,355))
+        screen_print('key_2.png', (45,45), (95,355))
+        screen_print('key_2.png', (45,45), (30,415))
+        screen_print('key_2.png', (45,45), (70,415))
+        
+
+    elif key==1:
+        screen_print('key.png', (45,45), (15,355))
+        screen_print('key_2.png', (45,45), (55,355))
+        screen_print('key_2.png', (45,45), (95,355))
+        screen_print('key_2.png', (45,45), (30,415))
+        screen_print('key_2.png', (45,45), (70,415))
+    
+    elif key==2:
+        screen_print('key.png', (45,45), (15,355))
+        screen_print('key.png', (45,45), (55,355))
+        screen_print('key_2.png', (45,45), (95,355))
+        screen_print('key_2.png', (45,45), (30,415))
+        screen_print('key_2.png', (45,45), (70,415))
+    
+    elif key==3:
+        screen_print('key.png', (45,45), (15,355))
+        screen_print('key.png', (45,45), (55,355))
+        screen_print('key.png', (45,45), (95,355))
+        screen_print('key_2.png', (45,45), (30,415))
+        screen_print('key_2.png', (45,45), (70,415))
+
+    elif key==4:
+        screen_print('key.png', (45,45), (15,355))
+        screen_print('key.png', (45,45), (55,355))
+        screen_print('key.png', (45,45), (95,355))
+        screen_print('key.png', (45,45), (30,415))
+        screen_print('key_2.png', (45,45), (70,415))
+
+    elif key>=5:
+        screen_print('key.png', (45,45), (15,355))
+        screen_print('key.png', (45,45), (55,355))
+        screen_print('key.png', (45,45), (95,355))
+        screen_print('key.png', (45,45), (30,415))
+        screen_print('key.png', (45,45), (70,415))
     
 def write_new_score(score_text): # write your score in the csv file
     global score
@@ -720,126 +779,128 @@ def check_death(): # check if the unicorn dies
             pygame.display.flip() # update screen
 
 def check_items(): # check if the unicorn get the stage items
-    global score, lifes, maze
+    global score, lifes, maze, key
     
     if maze==1:
         if (pygame.sprite.groupcollide(uni_group, cup_group_1, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-
-        if (pygame.sprite.groupcollide(uni_group, cof_group_1, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_1, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
     
     elif maze==2:
         if (pygame.sprite.groupcollide(uni_group, cup_group_2, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_2, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_2, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
-    
+        elif (pygame.sprite.groupcollide(uni_group, key_group_2, False, True, pygame.sprite.collide_mask)):
+            key+=1
+            score+=3000
+
     elif maze==3:
         if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
     
     elif maze==4:
         if (pygame.sprite.groupcollide(uni_group, cup_group_4, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_4, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_4, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
     
     elif maze==5:
         if (pygame.sprite.groupcollide(uni_group, cup_group_5, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_5, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_5, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
-    
+        elif (pygame.sprite.groupcollide(uni_group, key_group_5, False, True, pygame.sprite.collide_mask)):
+            key+=1
+            score+=3000
+
     elif maze==6:
         if (pygame.sprite.groupcollide(uni_group, cup_group_6, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_6, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_6, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
 
     elif maze==7:
         if (pygame.sprite.groupcollide(uni_group, cup_group_7, False, True, pygame.sprite.collide_mask)): 
             score+=1500
-        else: pass
-        if (pygame.sprite.groupcollide(uni_group, cof_group_7, False, True, pygame.sprite.collide_mask)):
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_7, False, True, pygame.sprite.collide_mask)):
             score+=1000
             lifes+=1
-        else: pass
+        elif (pygame.sprite.groupcollide(uni_group, key_group_7, False, True, pygame.sprite.collide_mask)):
+            key+=1
+            score+=3000
 
-    # elif maze==2:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_2, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_2, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
+    elif maze==8:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_8, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_8, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+        elif (pygame.sprite.groupcollide(uni_group, key_group_8, False, True, pygame.sprite.collide_mask)):
+            key+=1
+            score+=3000
     
-    # elif maze==3:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
-    
-    # elif maze==4:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_4, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_4, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
-    
-    # elif maze==5:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_5, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_5, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
-    
-    # elif maze==6:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_6, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_6, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
+    elif maze==9:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_9, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_9, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
 
-    # elif maze==7:
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_7, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     else: pass
-    #     if (pygame.sprite.groupcollide(uni_group, cof_group_7, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    #     else: pass
+    elif maze==10:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_10, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_10, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+    
+    elif maze==11:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_11, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_11, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+    
+    elif maze==12:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_12, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_12, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
 
+    elif maze==13:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_13, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_13, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+
+    elif maze==14:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_14, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_14, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+
+    elif maze==15:
+        if (pygame.sprite.groupcollide(uni_group, cup_group_15, False, True, pygame.sprite.collide_mask)): 
+            score+=1500
+        elif (pygame.sprite.groupcollide(uni_group, cof_group_15, False, True, pygame.sprite.collide_mask)):
+            score+=1000
+            lifes+=1
+        elif (pygame.sprite.groupcollide(uni_group, key_group_15, False, True, pygame.sprite.collide_mask)):
+            key+=1
+            score+=3000
+    
 def move_uni():
     global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
@@ -935,6 +996,15 @@ def create_cof(COF_SIZE, COF_POS, MAZE):
     elif MAZE==14: cof_group_14.add(cof)
     elif MAZE==15: cof_group_15.add(cof)
 
+def create_key(KEY_SIZE, KEY_POS, MAZE):
+    key = Key(KEY_SIZE, KEY_POS)
+    
+    if MAZE==2: key_group_2.add(key)
+    elif MAZE==5: key_group_5.add(key)
+    elif MAZE==7: key_group_7.add(key)
+    elif MAZE==8: key_group_8.add(key)
+    elif MAZE==15: key_group_15.add(key)
+
 def reset_items(): # reset the collectable items of the game
     # maze 1 items
     create_cup((20,20),(424,102),1)
@@ -945,13 +1015,15 @@ def reset_items(): # reset the collectable items of the game
     create_cup((20,20),(326,205),2)
     create_cup((20,20),(450,425),2)
     create_cup((20,20),(652,128),2)
+    create_key((20,20),(726,28),2)
 
 def reset_stage(): # place unicorn and all mobs in the initial place of the stage
-    global maze, last_maze, item_sprite_group
+    global maze, last_maze, item_sprite_group, uni_pos
 
     if maze==1: 
         erase()
         break_move()
+        uni_pos=(200,200)
         clear_groups()
         item_sprite_group=1
         create_uni((22, 22),(388, 18))
@@ -964,14 +1036,18 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
     elif maze==2: 
         erase()
         break_move()
+        uni_pos=(200,200)
         clear_groups()
         item_sprite_group=2
         create_uni((22, 22),(750, 400))
+        create_wolf((22,22),(338,352),'X')
+        create_wolf((22,22),(250,112),'Y')
         create_wall('maze_2.png', (650, 500)) 
     
     elif maze==3: 
         erase()
         break_move()
+        uni_pos=(200,200)
         clear_groups()
         item_sprite_group=3
         create_wolf((22,22),(180,136),'X')
@@ -990,7 +1066,17 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
     # elif maze==7: 
     # elif maze==8:
     # elif maze==9:
-    # elif maze==10: 
+    
+    elif maze==10: 
+        erase()
+        break_move()
+        uni_pos=(200,200)
+        clear_groups()
+        item_sprite_group=10
+        create_wall('maze_10.png', (650, 500))  
+        if last_maze==3: create_uni((22, 22),(452, 460))
+        elif last_maze==6: create_uni((22, 22),(176, 224))
+
     # elif maze==11: 
     # elif maze==12:
     # elif maze==13: 
@@ -1000,21 +1086,56 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
 def print_items(): # draw the collectable iten from each maze in the screen
     global item_sprite_group
 
-    if item_sprite_group==1: cup_group_1.draw(second_screen), cof_group_1.draw(second_screen)
-    elif item_sprite_group==2: cup_group_2.draw(second_screen), cof_group_2.draw(second_screen)
-    elif item_sprite_group==3: cup_group_3.draw(second_screen), cof_group_3.draw(second_screen)
-    elif item_sprite_group==4: cup_group_4.draw(second_screen), cof_group_4.draw(second_screen)
-    elif item_sprite_group==5: cup_group_5.draw(second_screen), cof_group_5.draw(second_screen)
-    elif item_sprite_group==6: cup_group_6.draw(second_screen), cof_group_6.draw(second_screen)
-    elif item_sprite_group==7: cup_group_7.draw(second_screen), cof_group_7.draw(second_screen)
-    elif item_sprite_group==8: cup_group_8.draw(second_screen), cof_group_8.draw(second_screen)
-    elif item_sprite_group==9: cup_group_9.draw(second_screen), cof_group_9.draw(second_screen)
-    elif item_sprite_group==10: cup_group_10.draw(second_screen), cof_group_10.draw(second_screen)
-    elif item_sprite_group==11: cup_group_11.draw(second_screen), cof_group_11.draw(second_screen)
-    elif item_sprite_group==12: cup_group_12.draw(second_screen), cof_group_12.draw(second_screen)
-    elif item_sprite_group==13: cup_group_13.draw(second_screen), cof_group_13.draw(second_screen)
-    elif item_sprite_group==14: cup_group_14.draw(second_screen), cof_group_14.draw(second_screen)
-    elif item_sprite_group==15: cup_group_15.draw(second_screen), cof_group_15.draw(second_screen)
+    if item_sprite_group==1: 
+        cup_group_1.draw(second_screen)
+        cof_group_1.draw(second_screen)
+    elif item_sprite_group==2: 
+        cup_group_2.draw(second_screen)
+        cof_group_2.draw(second_screen)
+        key_group_2.draw(second_screen)
+    elif item_sprite_group==3: 
+        cup_group_3.draw(second_screen)
+        cof_group_3.draw(second_screen)
+    elif item_sprite_group==4: 
+        cup_group_4.draw(second_screen) 
+        cof_group_4.draw(second_screen)
+    elif item_sprite_group==5: 
+        cup_group_5.draw(second_screen)
+        cof_group_5.draw(second_screen)
+        key_group_5.draw(second_screen)
+    elif item_sprite_group==6: 
+        cup_group_6.draw(second_screen)
+        cof_group_6.draw(second_screen)
+    elif item_sprite_group==7: 
+        cup_group_7.draw(second_screen)
+        cof_group_7.draw(second_screen)
+        key_group_7.draw(second_screen)
+    elif item_sprite_group==8: 
+        cup_group_8.draw(second_screen)
+        cof_group_8.draw(second_screen)
+        key_group_8.draw(second_screen)
+    elif item_sprite_group==9: 
+        cup_group_9.draw(second_screen)
+        cof_group_9.draw(second_screen)
+    elif item_sprite_group==10: 
+        cup_group_10.draw(second_screen)
+        cof_group_10.draw(second_screen)
+    elif item_sprite_group==11: 
+        cup_group_11.draw(second_screen)
+        cof_group_11.draw(second_screen)
+    elif item_sprite_group==12: 
+        cup_group_12.draw(second_screen)
+        cof_group_12.draw(second_screen)
+    elif item_sprite_group==13: 
+        cup_group_13.draw(second_screen)
+        cof_group_13.draw(second_screen)
+    elif item_sprite_group==14: 
+        cup_group_14.draw(second_screen)
+        cof_group_14.draw(second_screen)
+    elif item_sprite_group==15: 
+        cup_group_15.draw(second_screen)
+        cof_group_15.draw(second_screen)
+        key_group_15.draw(second_screen)
 
 def clear_groups(): # clear all sprites in all groups, except for the collectable items groups
     uni_group.empty()
@@ -1042,6 +1163,7 @@ def default_functions(): # run all the deafult functions to make the game run
         uni_group.draw(second_screen)
         print_score()
         print_lifes()
+        print_key()
         screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
         pygame.display.flip() # update screen
 
@@ -1089,6 +1211,12 @@ cof_group_14 = pygame.sprite.Group()
 cup_group_15 = pygame.sprite.Group()
 cof_group_15 = pygame.sprite.Group()
 
+# create the sprite group for the 5 collectable keys in the game, just in 5 stages (2, 5, 7, 8 and 15)
+key_group_2 = pygame.sprite.Group()
+key_group_5 = pygame.sprite.Group()
+key_group_7 = pygame.sprite.Group()
+key_group_8 = pygame.sprite.Group()
+key_group_15 = pygame.sprite.Group()
 
 maze = 0 # var that control the game stage, maze 0 is the start menu
 last_maze = 0 # keep the last maze, to control change between stages
@@ -1105,6 +1233,7 @@ while True: # game main loop
         score = 0 # initial score
         mob_speed = 70 # this var control the speed of all mobs in the game, (lower number = higher speed)
         lifes = 1 # initial unicorn lifes
+        key = 0 # game keys cont
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
@@ -1128,18 +1257,21 @@ while True: # game main loop
             last_maze=2
             update_screen=False
         default_functions()
-        print(uni_pos)
 
     if maze==3:
         reset_stage()     
     while maze==3:    
+        print(uni_pos)
         if uni_pos[1]>500: 
             maze=1
             last_maze=3
-            update_screen=False
-        elif uni_pos[0]<150: maze=2
+        elif uni_pos[0]<150: 
+            maze=2
+            last_maze=3
+        elif uni_pos[1]<0: 
+            maze=10
+            last_maze=3
         default_functions()
-        print(uni_pos)
         
 
     if maze==7:
@@ -1154,6 +1286,22 @@ while True: # game main loop
             last_maze=1
         default_functions()
         print(uni_pos)
+
+    
+    if maze==10:
+        reset_stage()     
+    while maze==10:    
+        if uni_pos[1]>500: 
+            maze=3
+            last_maze=10
+        elif uni_pos[0]<150: 
+            maze=2
+            last_maze=10
+        elif uni_pos[1]<0: 
+            maze=10
+            last_maze=10
+        default_functions()
+        # print(uni_pos)
             
             
           
