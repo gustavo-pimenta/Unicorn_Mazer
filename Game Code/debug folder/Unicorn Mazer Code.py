@@ -1016,9 +1016,32 @@ def reset_items(): # reset the collectable items of the game
     create_cup((20,20),(450,425),2)
     create_cup((20,20),(652,128),2)
     create_key((20,20),(726,28),2)
+    # maze 5 items
+    create_cup((20,20),(545,230),5)
+    create_cup((20,20),(345,126),5)
+    create_key((25,25),(457,234),5)
+    # maze 6 items
+    create_cup((20,20),(738,34),6)
+    create_cup((20,20),(466,186),6)
+    # maze 7 items
+    create_cup((10,10),(552,382),7)
+    create_cof((10,10),(364,164),7)
+    create_cup((10,10),(602,290),7)
+    create_key((12,12),(396,246),7)
+    # maze 8 items
+    create_cup((10,10),(506,114),8)
+    create_cup((10,10),(314,222),8)
+    create_key((12,12),(394,246),8)
+    # maze 9 items
+    create_cup((10,10),(395,390),9)
+    create_cup((10,10),(395,252),9)
+    create_cup((10,10),(395,102),9)
+    create_cup((10,10),(214,242),9)
+    create_cup((10,10),(577,242),9)
+    
 
 def reset_stage(): # place unicorn and all mobs in the initial place of the stage
-    global maze, last_maze, item_sprite_group, uni_pos
+    global maze, last_maze, item_sprite_group, uni_pos, key
 
     if maze==1: 
         erase()
@@ -1060,6 +1083,7 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         if last_maze==1: create_uni((22, 22),(452, 460))
         elif last_maze==2: create_uni((22, 22),(176, 224))
         elif last_maze==10: create_uni((22, 22),(496, 28))
+        elif last_maze==4: create_uni((22, 22),(755, 228))
     
     elif maze==4: 
         erase()
@@ -1068,6 +1092,8 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         clear_groups()
         item_sprite_group=4
         create_wall('maze_4.png', (650, 500))  
+        if last_maze==3: create_uni((22, 22),(160, 238))
+        elif last_maze==13: create_uni((22, 22),(768, 238))
         
     elif maze==5: 
         erase()
@@ -1084,7 +1110,10 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         uni_pos=(200,200)
         clear_groups()
         item_sprite_group=6
-        create_wall('maze_6.png', (650, 500))  
+        create_wall('maze_6.png', (650, 500)) 
+        create_bull((22,22),(446,38))  
+        create_bull((22,22),(326,426))  
+        create_bull((22,22),(254,26))
         if last_maze==5: create_uni((22, 22),(172, 52))
         else: create_uni((22, 22),(754, 426))
 
@@ -1097,7 +1126,6 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         create_wall('maze_7.png', (500,500))  
         create_uni((8, 8),(164, 238))
         
-
     elif maze==8: 
         erase()
         break_move()
@@ -1114,6 +1142,15 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         clear_groups()
         item_sprite_group=9
         create_wall('maze_9.png', (500,500))  
+        create_wolf((9,9),(166,102),'Y')
+        create_wolf((9,9),(626,102),'Y')
+        create_wolf((9,9),(626,390),'Y')
+        create_wolf((9,9),(166,390),'Y')
+        create_wolf((9,9),(398,354),'X')
+        create_wolf((9,9),(238,246),'Y')
+        create_wolf((9,9),(550,246),'Y')
+        create_wolf((9,9),(398,142),'X')
+        create_wolf((9,9),(398,14),'X')
         if last_maze==10: create_uni((8, 8),(394, 478))
         elif last_maze==7: create_uni((8, 8),(626, 46))
         elif last_maze==8: create_uni((8, 8),(162, 46))
@@ -1124,10 +1161,32 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         uni_pos=(200,200)
         clear_groups()
         item_sprite_group=10
-        create_wall('maze_10.png', (650, 500))  
+        create_wall('maze_10.png', (650, 500)) 
+        create_bull((22,22),(264,116)) 
+        create_bull((22,22),(276,240)) 
+        create_bull((22,22),(268,340)) 
+        create_bull((22,22),(464,112)) 
+        create_bull((22,22),(468,236)) 
+        create_bull((22,22),(488,360)) 
+        create_bull((22,22),(676,240)) 
+        create_bull((22,22),(684,364)) 
+        create_bull((22,22),(664,116)) 
         if last_maze==3: create_uni((22, 22),(452, 460))
         elif last_maze==6: create_uni((22, 22),(180, 224))
         elif last_maze==9: create_uni((22, 22),(496, 28))
+
+    elif maze==13: 
+        erase()
+        break_move()
+        uni_pos=(200,200)
+        clear_groups()
+        item_sprite_group=13
+        if key>=5:
+            create_wall('maze_13.1.png', (650, 500))  
+        else: 
+            create_wall('maze_13.2.png', (650, 500))  
+        if last_maze==4: create_uni((22, 22),(160, 238))
+        # elif last_maze==13: create_uni((22, 22),(176, 224))
 
     # elif maze==11: 
     # elif maze==12:
@@ -1289,8 +1348,8 @@ while True: # game main loop
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=10
-        last_maze=6
+        maze=4
+        last_maze=3
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
     if maze==1:
@@ -1320,10 +1379,25 @@ while True: # game main loop
         elif uni_pos[0]<150: 
             maze=2
             last_maze=3
+        elif uni_pos[0]>800: 
+            maze=4
+            last_maze=3
         elif uni_pos[1]<0: 
             maze=10
             last_maze=3
         default_functions()
+    
+    if maze==4:
+        reset_stage()     
+    while maze==4:    
+        if uni_pos[0]<150: 
+            maze=3
+            last_maze=4
+        elif uni_pos[0]>800:
+            maze=13
+            last_maze=4
+        default_functions()
+        print(uni_pos)
     
     if maze==5:
         reset_stage()     
@@ -1332,7 +1406,6 @@ while True: # game main loop
             maze=6
             last_maze=5
         default_functions()
-        print(uni_pos)
 
     if maze==6:
         reset_stage()     
@@ -1344,7 +1417,6 @@ while True: # game main loop
             maze=10
             last_maze=6
         default_functions()
-        print(uni_pos)
 
     if maze==7:
         reset_stage()
@@ -1353,7 +1425,6 @@ while True: # game main loop
             maze=9
             last_maze=7
         default_functions()
-        print(uni_pos)
 
     if maze==8:
         reset_stage()
@@ -1362,8 +1433,7 @@ while True: # game main loop
             maze=9
             last_maze=8
         default_functions()
-        print(uni_pos)
-    
+        
     if maze==9:
         reset_stage()
     while maze==9:
@@ -1377,9 +1447,7 @@ while True: # game main loop
             maze=10
             last_maze=9
         default_functions()
-        print(uni_pos)
-
-    
+          
     if maze==10:
         reset_stage()     
     while maze==10:    
@@ -1391,8 +1459,15 @@ while True: # game main loop
             last_maze=10
         elif uni_pos[1]<0: 
             maze=9
-            last_maze=10
-        
+            last_maze=10 
+        default_functions()
+
+    if maze==13:
+        reset_stage()     
+    while maze==13:    
+        if uni_pos[0]<150: 
+            maze=4
+            last_maze=13
         default_functions()
         print(uni_pos)
             
