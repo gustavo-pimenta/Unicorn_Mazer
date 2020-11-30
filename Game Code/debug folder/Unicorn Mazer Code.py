@@ -66,7 +66,7 @@ class Unicorn(pygame.sprite.Sprite):
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
 
-        SPEED = 4
+        SPEED = 2
 
         if moving_up == True: 
             self.rect[1] -= SPEED # move up 
@@ -264,9 +264,12 @@ class Boss(pygame.sprite.Sprite):
         
 
     def update(self):
+        global boss_alive
         
-        # change between 3 sprites
-        if self.lifes<=0: self.image = self.images[2] # dead sprite
+        if self.lifes<=0: 
+            self.image = self.images[2] # dead sprite
+            boss_alive = False
+            
         else:
             if self.current_image<=1: self.image = self.images[0] # closed mouth sprite
             elif self.current_image>1: self.image = self.images[1] # open mouth sprite
@@ -635,11 +638,14 @@ def event_reader_old(): # read ALL screen events HIGH PROCESSING CPU
         elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
 def event_reader(): # read events using WAIT function 
-    global moving_up, moving_down, moving_left, moving_right, height, width
+    global moving_up, moving_down, moving_left, moving_right, height, width, clock
 
-    event = pygame.event.wait(timeout=10)
+    event = pygame.event.wait(timeout=1)
     
-    if event.type == pygame.NOEVENT: return # break function if NO EVENT
+    
+    if event.type == pygame.NOEVENT: 
+        clock-=2 # clock time to move mobs
+        return # break function if NO EVENT
 
     if event.type == QUIT: pygame.display.quit() # when the player close the game
 
@@ -908,27 +914,27 @@ def check_items(): # check if the unicorn get the stage items
             score+=3000
     
 def move_uni():
-    global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos
+    global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos, clock
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
     if moving_up==True or moving_down==True or moving_right==True or moving_left==True:
         update_screen = True
+        clock-=8 # clock time to move mobs
         for uni in uni_group:
                 uni_pos=(uni.get_UNI_POS()) # get the current unicorn position
 
 def move_mobs():
-    global mob_speed, update_screen
+    global update_screen, clock
 
-    if mob_speed<=0:
+    if clock<0:
         bull_group.update()
         wolf_group.update()
         boss_group.update()
         slime_group.update()
         runa_group.update()
         update_screen=True
-        mob_speed=70
-    else: mob_speed-=1  
+        clock=1000  
 
 def create_uni(UNI_SIZE, UNI_POS):
     # UNI_SIZE (25,25) for small mazes and (10,10) for big mazes
@@ -1049,9 +1055,8 @@ def reset_items(): # reset the collectable items of the game
     create_cup((10,10),(214,242),9)
     create_cup((10,10),(577,242),9)
     
-
 def reset_stage(): # place unicorn and all mobs in the initial place of the stage
-    global maze, last_maze, item_sprite_group, uni_pos, key
+    global maze, last_maze, item_sprite_group, uni_pos, key, boss_alive
 
     if maze==1: 
         erase()
@@ -1124,6 +1129,7 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         create_bull((22,22),(446,38))  
         create_bull((22,22),(326,426))  
         create_bull((22,22),(254,26))
+        create_bull((20,20),(462,166))
         if last_maze==5: create_uni((22, 22),(172, 52))
         else: create_uni((22, 22),(754, 426))
 
@@ -1207,8 +1213,9 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         clear_groups()
         item_sprite_group=14
         create_uni((22, 22),(202, 443))
-        create_boss()
         create_wall('maze_14.png', (650,500)) 
+        if boss_alive==True:
+            create_boss()
 
     # elif maze==11: 
     # elif maze==12:
@@ -1364,18 +1371,23 @@ while True: # game main loop
         # INITIAL GAME VARS
         hurt = False # damaged unicorn var
         dead = False # game over var
+        boss_alive = True # keep info if the boss dies
         update_screen = False # var that controls how many times the screen be updated
         uni_pos=[0,0] # global unicorn position to move between stages
         score = 0 # initial score
-        mob_speed = 70 # this var control the speed of all mobs in the game, (lower number = higher speed)
         lifes = 1 # initial unicorn lifes
-        key = 0 # game keys cont
+        key = 5 # game keys cont
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=13
-        last_maze=4
+        maze=1
+        # last_maze=13
         item_sprite_group=1 # sprite group of the colletable items of each stage
+
+        clock = 1000 # clock is the variable that controls the movement speed of the game mobs
+        # this var is reduced by different values when the unicorn is moving or not
+        # because the unicorn movement change the frame rate of the game, also the mobs speed
+         
 
     if maze==1:
         reset_stage()
@@ -1420,7 +1432,6 @@ while True: # game main loop
             maze=13
             last_maze=4
         default_functions()
-        print(uni_pos)
     
     if maze==5:
         reset_stage()     
@@ -1495,17 +1506,14 @@ while True: # game main loop
             maze=14
             last_maze=13
         default_functions()
-        print(uni_pos)
 
     if maze==14:
         reset_stage()
     while maze==14:    
         if uni_pos[1]>500: 
             maze=13
-            last_maze=14
-            
+            last_maze=14 
         default_functions()
-        print(uni_pos)
             
             
           
