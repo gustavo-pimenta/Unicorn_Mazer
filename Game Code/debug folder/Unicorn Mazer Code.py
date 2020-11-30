@@ -238,7 +238,7 @@ class Boss(pygame.sprite.Sprite):
                        pygame.image.load('boss_4.png').convert_alpha()]
 
         BOSS_SIZE = (350,400)
-        BOSS_POS = (240,0)
+        BOSS_POS = (240,30)
 
         self.images[0] = pygame.transform.scale(self.images[0], BOSS_SIZE)
         self.images[1] = pygame.transform.scale(self.images[1], BOSS_SIZE)
@@ -275,24 +275,30 @@ class Boss(pygame.sprite.Sprite):
             
             BOSS_SPEED = 30
             
-            if self.direction=='+': # move down
-                self.rect[1]+=BOSS_SPEED
+            if self.direction=='+': # move right
+                self.rect[0]+=BOSS_SPEED
                 if wall_collide(boss_group)==True: # wall collide change direction
-                    self.rect[1]-=BOSS_SPEED
+                    self.rect[0]-=BOSS_SPEED
                     self.direction='-'
-                    create_runa((380,430))
+                    create_runa((726,231))
+                    create_slime()
+                    create_slime()
+                    create_slime()
                     create_slime()
                     create_slime()
                     create_slime()
                     create_slime()
                     create_slime()
 
-            if self.direction=='-': # move up
-                self.rect[1]-=BOSS_SPEED
+            if self.direction=='-': # move left
+                self.rect[0]-=BOSS_SPEED
                 if wall_collide(boss_group)==True: # wall collide change direction
-                    self.rect[1]+=BOSS_SPEED
+                    self.rect[0]+=BOSS_SPEED
                     self.direction='+'
-                    create_runa((380,40))
+                    create_runa((198,231))
+                    create_slime()
+                    create_slime()
+                    create_slime()
                     create_slime()
                     create_slime()
                     create_slime()
@@ -310,7 +316,7 @@ class Slime(pygame.sprite.Sprite):
                        pygame.image.load('slime_4.png').convert_alpha()]
 
         SLIME_SIZE = (40,40)
-        SLIME_POS = ((randrange(170,600,20)),(randrange(50,450,20)))
+        SLIME_POS = ((randrange(170,720,20)),(randrange(50,450,20)))
 
         self.images[0] = pygame.transform.scale(self.images[0], SLIME_SIZE)
         self.images[1] = pygame.transform.scale(self.images[1], SLIME_SIZE)
@@ -329,7 +335,7 @@ class Slime(pygame.sprite.Sprite):
         self.rect[1] = SLIME_POS[1]
 
         while (pygame.sprite.groupcollide(uni_group, slime_group, False, False, pygame.sprite.collide_mask)==True):
-            SLIME_POS = ((randrange(170,600,20)),(randrange(50,450,20)))
+            SLIME_POS = ((randrange(170,720,20)),(randrange(50,450,20)))
             self.rect[0] = SLIME_POS[0]
             self.rect[1] = SLIME_POS[1]
 
@@ -369,7 +375,7 @@ class Runa(pygame.sprite.Sprite):
     def update(self):
         
         self.time+=1
-        if 3<self.time: self.kill() # kill after the time passed
+        if 6<self.time: self.kill() # kill after the time passed
 
 class Wall(pygame.sprite.Sprite):
 
@@ -1016,6 +1022,10 @@ def reset_items(): # reset the collectable items of the game
     create_cup((20,20),(450,425),2)
     create_cup((20,20),(652,128),2)
     create_key((20,20),(726,28),2)
+    # maze 4 items
+    create_cup((20,20),(660,176),4)
+    create_cof((20,20),(452,302),4)
+    create_cup((20,20),(552,406),4)
     # maze 5 items
     create_cup((20,20),(545,230),5)
     create_cup((20,20),(345,126),5)
@@ -1185,8 +1195,20 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
             create_wall('maze_13.1.png', (650, 500))  
         else: 
             create_wall('maze_13.2.png', (650, 500))  
-        if last_maze==4: create_uni((22, 22),(160, 238))
-        # elif last_maze==13: create_uni((22, 22),(176, 224))
+        if last_maze==4: create_uni((22, 22),(160, 226))
+        elif last_maze==14: create_uni((22, 22),(647, 368))
+        elif last_maze==15: create_uni((22, 22),(287, 456))
+        elif last_maze==12: create_uni((22, 22),(271, 24))
+    
+    if maze==14: 
+        erase()
+        break_move()
+        uni_pos=(200,200)
+        clear_groups()
+        item_sprite_group=14
+        create_uni((22, 22),(202, 443))
+        create_boss()
+        create_wall('maze_14.png', (650,500)) 
 
     # elif maze==11: 
     # elif maze==12:
@@ -1253,6 +1275,9 @@ def clear_groups(): # clear all sprites in all groups, except for the collectabl
     bull_group.empty()
     wolf_group.empty()
     wall_group.empty()
+    slime_group.empty()
+    runa_group.empty()
+    boss_group.empty()
 
 def default_functions(): # run all the deafult functions to make the game run
     global update_screen
@@ -1348,8 +1373,8 @@ while True: # game main loop
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=4
-        last_maze=3
+        maze=13
+        last_maze=4
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
     if maze==1:
@@ -1358,7 +1383,6 @@ while True: # game main loop
         if uni_pos[1]<0: 
             maze=3
             last_maze=1
-            update_screen=False
         default_functions()
 
     if maze==2:
@@ -1367,7 +1391,6 @@ while True: # game main loop
         if uni_pos[0]>800: 
             maze=3
             last_maze=2
-            update_screen=False
         default_functions()
 
     if maze==3:
@@ -1468,6 +1491,19 @@ while True: # game main loop
         if uni_pos[0]<150: 
             maze=4
             last_maze=13
+        elif (635<uni_pos[0]<665) and (312<uni_pos[1]<350): 
+            maze=14
+            last_maze=13
+        default_functions()
+        print(uni_pos)
+
+    if maze==14:
+        reset_stage()
+    while maze==14:    
+        if uni_pos[1]>500: 
+            maze=13
+            last_maze=14
+            
         default_functions()
         print(uni_pos)
             
