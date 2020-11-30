@@ -264,11 +264,12 @@ class Boss(pygame.sprite.Sprite):
         
 
     def update(self):
-        global boss_alive
+        global boss_alive, score
         
         if self.lifes<=0: 
             self.image = self.images[2] # dead sprite
             boss_alive = False
+            score+=53500
             
         else:
             if self.current_image<=1: self.image = self.images[0] # closed mouth sprite
