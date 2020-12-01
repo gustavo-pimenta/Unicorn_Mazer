@@ -465,6 +465,24 @@ class Trophy(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+class Shadow(pygame.sprite.Sprite):
+
+    def __init__(self, UNI_POS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('shadow.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (1200,1200))
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = UNI_POS[0]-500
+        self.rect[1] = UNI_POS[1]-500
+
+        self.mask = pygame.mask.from_surface(self.image)
+    
+    def update(self, UNI_POS):
+        self.rect[0] = UNI_POS[0]-590
+        self.rect[1] = UNI_POS[1]-590
+
 def num6dig(num):
     if num<0: num=0 # avoid negative score
 
@@ -939,7 +957,7 @@ def check_items(): # check if the unicorn get the stage items
             score+=3000
     
 def move_uni():
-    global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos, clock
+    global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos, clock, maze
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
@@ -948,6 +966,9 @@ def move_uni():
         clock-=8 # clock time to move mobs
         for uni in uni_group:
                 uni_pos=(uni.get_UNI_POS()) # get the current unicorn position
+    
+    if maze==15 or maze==12:
+        shadow_group.update(uni_pos)
 
 def move_mobs():
     global update_screen, clock
@@ -990,6 +1011,11 @@ def create_runa(RUNA_POS):
 def create_wall(wall_file, WALL_SIZE):
     wall = Wall(wall_file, WALL_SIZE)
     wall_group.add(wall)
+
+def create_shadow():
+    global uni_pos
+    shadow = Shadow(uni_pos)
+    shadow_group.add(shadow)
 
 def create_ground(ground_file):
     ground = Wall(ground_file)
@@ -1084,7 +1110,13 @@ def reset_items(): # reset the collectable items of the game
     create_cup((10,10),(395,102),9)
     create_cup((10,10),(214,242),9)
     create_cup((10,10),(577,242),9)
-    
+    # maze 11 items
+    create_cup((20,20),(627,226),11)
+    create_cup((20,20),(460,226),11)
+    create_cup((20,20),(300,226),11)
+    create_cup((20,20),(455,438),11)
+    create_cup((20,20),(455,36),11)
+   
 def reset_stage(): # place unicorn and all mobs in the initial place of the stage
     global maze, last_maze, item_sprite_group, uni_pos, key, boss_alive
 
@@ -1220,7 +1252,47 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         if last_maze==3: create_uni((22, 22),(452, 460))
         elif last_maze==6: create_uni((22, 22),(180, 224))
         elif last_maze==9: create_uni((22, 22),(496, 28))
+        elif last_maze==11: create_uni((22, 22),(750, 224))
 
+    elif maze==11: 
+        erase()
+        break_move()
+        uni_pos=(200,200)
+        clear_groups()
+        item_sprite_group=11
+        create_wall('maze_11.png', (650, 500))  
+        create_wolf((22,22),(200,70),'Y')
+        create_wolf((22,22),(250,85),'Y')
+        create_wolf((22,22),(300,90),'Y')
+        create_wolf((22,22),(350,105),'Y')
+        create_wolf((22,22),(400,120),'Y')
+        create_wolf((22,22),(450,135),'Y')
+        create_wolf((22,22),(500,150),'Y')
+        create_wolf((22,22),(550,165),'Y')
+        create_wolf((22,22),(600,180),'Y')
+        create_wolf((22,22),(650,195),'Y')
+        create_wolf((22,22),(700,210),'Y')
+        create_wolf((22,22),(455,86),'X')
+        create_wolf((22,22),(455,242),'X')
+        create_wolf((22,22),(455,408),'X')
+        if last_maze==12: create_uni((22, 22),(761, 226))
+        elif last_maze==10: create_uni((22, 22),(169, 226))
+
+    elif maze==12: 
+        erase()
+        break_move()
+        uni_pos=(200,200)
+        clear_groups()
+        item_sprite_group=12
+        create_wall('maze_12.png', (500,500))  
+        if last_maze==13: 
+            create_uni((8, 8),(394, 478))
+            uni_pos=(394, 478)
+        elif last_maze==11: 
+            create_uni((8, 8),(162, 244))
+            uni_pos=(162, 244)
+        create_shadow()
+        
     elif maze==13: 
         erase()
         break_move()
@@ -1248,12 +1320,16 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         create_wall('maze_14.png', (650,500)) 
         if boss_alive==True:
             create_boss()
-
-    # elif maze==11: 
-    # elif maze==12:
-    # elif maze==13: 
-    # elif maze==14: 
-    # elif maze==15: 
+    
+    if maze==15: 
+        erase()
+        break_move()
+        uni_pos=(210,22)
+        clear_groups()
+        item_sprite_group=15
+        create_shadow()
+        create_uni((22, 22),(210, 22))
+        create_wall('maze_15.png', (500,500)) 
 
 def print_items(): # draw the collectable iten from each maze in the screen
     global item_sprite_group
@@ -1318,6 +1394,7 @@ def clear_groups(): # clear all sprites in all groups, except for the collectabl
     runa_group.empty()
     boss_group.empty()
     trophy_group.empty()
+    shadow_group.empty()
 
 def default_functions(): # run all the deafult functions to make the game run
     global update_screen
@@ -1338,6 +1415,7 @@ def default_functions(): # run all the deafult functions to make the game run
         trophy_group.draw(second_screen)
         print_items()
         uni_group.draw(second_screen)
+        shadow_group.draw(second_screen)
         print_score()
         print_lifes()
         print_key()
@@ -1356,6 +1434,7 @@ runa_group = pygame.sprite.Group() # create the runa sprite group
 wall_group = pygame.sprite.Group() # create maze's wall sprite group
 ground_group = pygame.sprite.Group() # create ground sprite group
 trophy_group = pygame.sprite.Group() # create trophy sprite group
+shadow_group = pygame.sprite.Group() # create shadow sprite group
 
 # create all items sprite groups, one group for each maze, to make the items collectable only once
 cup_group_1 = pygame.sprite.Group()
@@ -1415,7 +1494,8 @@ while True: # game main loop
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=1 
+        maze=12
+        last_maze=11
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
@@ -1525,10 +1605,36 @@ while True: # game main loop
         elif uni_pos[0]<150: 
             maze=6
             last_maze=10
+        elif uni_pos[0]>800: 
+            maze=11
+            last_maze=10
         elif uni_pos[1]<0: 
             maze=9
             last_maze=10 
         default_functions()
+
+    if maze==11:
+        reset_stage()     
+    while maze==11:    
+        if uni_pos[0]<150: 
+            maze=10
+            last_maze=11
+        elif uni_pos[0]>800: 
+            maze=12
+            last_maze=11
+        default_functions()
+
+    if maze==12:
+        reset_stage()
+    while maze==12:   
+        if uni_pos[0]<150: 
+            maze=11
+            last_maze=12
+        elif uni_pos[1]>495: 
+            maze=13
+            last_maze=12
+        default_functions()
+        print(uni_pos)
 
     if maze==13:
         reset_stage()     
@@ -1539,6 +1645,12 @@ while True: # game main loop
         elif (635<uni_pos[0]<665) and (312<uni_pos[1]<350): 
             maze=14
             last_maze=13
+        elif uni_pos[1]>500: 
+            maze=15
+            last_maze=13
+        elif uni_pos[1]<0: 
+            maze=12
+            last_maze=13
         default_functions()
 
     if maze==14:
@@ -1548,3 +1660,11 @@ while True: # game main loop
             maze=13
             last_maze=14 
         default_functions()   
+
+    if maze==15:
+        reset_stage()
+    while maze==15:    
+        if uni_pos[1]<0: 
+            maze=13
+            last_maze=15
+        default_functions() 
