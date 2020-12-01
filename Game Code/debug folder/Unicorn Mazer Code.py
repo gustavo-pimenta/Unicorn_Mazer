@@ -628,7 +628,9 @@ def event_reader_old(): # read ALL screen events HIGH PROCESSING CPU
 
     for event in pygame.event.get():
     
-        if event.type == QUIT: pygame.display.quit() # when the player close the game
+        if event.type == QUIT: # when the player close the game
+            pygame.display.quit() 
+            sys.exit(0)
 
         elif event.type == VIDEORESIZE: # when the player resize the window
             
@@ -662,7 +664,9 @@ def event_reader(): # read events using WAIT function
         clock-=2 # clock time to move mobs
         return # break function if NO EVENT
 
-    if event.type == QUIT: pygame.display.quit() # when the player close the game
+    if event.type == QUIT: # when the player close the game
+        pygame.display.quit() 
+        sys.exit(0)
 
     elif event.type == VIDEORESIZE: # when the player resize the window
         
@@ -688,7 +692,9 @@ def death_screen_event_reader():
 
     event = pygame.event.wait(timeout=600)
 
-    if event.type == QUIT: pygame.display.quit() # when the player close the game
+    if event.type == QUIT: # when the player close the game
+        pygame.display.quit() 
+        sys.exit(0)
 
     elif event.type == VIDEORESIZE: # when the player resize the window
         
@@ -731,7 +737,9 @@ def hurt_screen_event_reader(): # read all screen events in the death screen
 
     event = pygame.event.wait(timeout=600)
 
-    if event.type == QUIT: pygame.display.quit() # when the player close the game
+    if event.type == QUIT: # when the player close the game
+        pygame.display.quit() 
+        sys.exit(0)
 
     elif event.type == VIDEORESIZE: # when the player resize the window
         
@@ -1403,12 +1411,11 @@ while True: # game main loop
         uni_pos=[0,0] # global unicorn position to move between stages
         score = 0 # initial score
         lifes = 1 # initial unicorn lifes
-        key = 5 # game keys cont
+        key = 0 # game keys cont
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=13
-        last_maze=4
+        maze=1 
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
@@ -1540,13 +1547,4 @@ while True: # game main loop
         if uni_pos[1]>500: 
             maze=13
             last_maze=14 
-        default_functions()
-            
-            
-          
-
-
-        
-
-
-        
+        default_functions()   
