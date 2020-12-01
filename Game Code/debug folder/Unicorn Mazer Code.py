@@ -258,7 +258,7 @@ class Boss(pygame.sprite.Sprite):
         self.rect[1] = BOSS_POS[1]
     
     def boss_damage(self):
-        print('boss lifes = ', self.lifes)
+        print('boss lifes = ', (self.lifes-1))
         self.lifes-=1 # life damage
         self.image = self.images[3] # damaged sprite 
         
@@ -277,7 +277,7 @@ class Boss(pygame.sprite.Sprite):
             if self.current_image==0: self.current_image=3
             elif self.current_image>0: self.current_image-=1        
             
-            BOSS_SPEED = 30
+            BOSS_SPEED = 60
             
             if self.direction=='+': # move right
                 self.rect[0]+=BOSS_SPEED
@@ -448,6 +448,20 @@ class Key(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect[0] = KEY_POS[0]
         self.rect[1] = KEY_POS[1]
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+class Trophy(pygame.sprite.Sprite):
+
+    def __init__(self, TROPHY_SIZE, TROPHY_POS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('trophy.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, TROPHY_SIZE)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = TROPHY_POS[0]
+        self.rect[1] = TROPHY_POS[1]
 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -732,6 +746,10 @@ def hurt_screen_event_reader(): # read all screen events in the death screen
         reset_stage()
         hurt=False
 
+def end_game_screen():
+    while True:
+        print('end')
+
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
         return True
@@ -811,12 +829,12 @@ def check_items(): # check if the unicorn get the stage items
             key+=1
             score+=3000
 
-    elif maze==3:
-        if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
-            score+=1500
-        elif (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
-            score+=1000
-            lifes+=1
+    # elif maze==3:  MAZE 3 HAS NO ITEMS
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     elif (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
     
     elif maze==4:
         if (pygame.sprite.groupcollide(uni_group, cup_group_4, False, True, pygame.sprite.collide_mask)): 
@@ -869,12 +887,12 @@ def check_items(): # check if the unicorn get the stage items
             score+=1000
             lifes+=1
 
-    elif maze==10:
-        if (pygame.sprite.groupcollide(uni_group, cup_group_10, False, True, pygame.sprite.collide_mask)): 
-            score+=1500
-        elif (pygame.sprite.groupcollide(uni_group, cof_group_10, False, True, pygame.sprite.collide_mask)):
-            score+=1000
-            lifes+=1
+    # elif maze==10:  MAZE 10 HAS NO ITEMS
+    #     if (pygame.sprite.groupcollide(uni_group, cup_group_10, False, True, pygame.sprite.collide_mask)): 
+    #         score+=1500
+    #     elif (pygame.sprite.groupcollide(uni_group, cof_group_10, False, True, pygame.sprite.collide_mask)):
+    #         score+=1000
+    #         lifes+=1
     
     elif maze==11:
         if (pygame.sprite.groupcollide(uni_group, cup_group_11, False, True, pygame.sprite.collide_mask)): 
@@ -891,11 +909,9 @@ def check_items(): # check if the unicorn get the stage items
             lifes+=1
 
     elif maze==13:
-        if (pygame.sprite.groupcollide(uni_group, cup_group_13, False, True, pygame.sprite.collide_mask)): 
-            score+=1500
-        elif (pygame.sprite.groupcollide(uni_group, cof_group_13, False, True, pygame.sprite.collide_mask)):
-            score+=1000
-            lifes+=1
+        if (pygame.sprite.groupcollide(uni_group, trophy_group, False, True, pygame.sprite.collide_mask)):
+            score+=3000
+            end_game_screen()
 
     elif maze==14:
         if (pygame.sprite.groupcollide(uni_group, cup_group_14, False, True, pygame.sprite.collide_mask)): 
@@ -1018,6 +1034,11 @@ def create_key(KEY_SIZE, KEY_POS, MAZE):
     elif MAZE==8: key_group_8.add(key)
     elif MAZE==15: key_group_15.add(key)
 
+def create_trophy(TROPHY_SIZE, TROPHY_POS):
+
+    trophy = Trophy(TROPHY_SIZE,TROPHY_POS)
+    trophy_group.add(trophy)
+    
 def reset_items(): # reset the collectable items of the game
     # maze 1 items
     create_cup((20,20),(424,102),1)
@@ -1201,7 +1222,9 @@ def reset_stage(): # place unicorn and all mobs in the initial place of the stag
         if key>=5:
             create_wall('maze_13.1.png', (650, 500))  
         else: 
-            create_wall('maze_13.2.png', (650, 500))  
+            create_wall('maze_13.2.png', (650, 500))
+        if boss_alive==False:
+            create_trophy((100,100),(300,200))  
         if last_maze==4: create_uni((22, 22),(160, 226))
         elif last_maze==14: create_uni((22, 22),(647, 368))
         elif last_maze==15: create_uni((22, 22),(287, 456))
@@ -1286,6 +1309,7 @@ def clear_groups(): # clear all sprites in all groups, except for the collectabl
     slime_group.empty()
     runa_group.empty()
     boss_group.empty()
+    trophy_group.empty()
 
 def default_functions(): # run all the deafult functions to make the game run
     global update_screen
@@ -1303,6 +1327,7 @@ def default_functions(): # run all the deafult functions to make the game run
         slime_group.draw(second_screen)
         runa_group.draw(second_screen)
         boss_group.draw(second_screen)
+        trophy_group.draw(second_screen)
         print_items()
         uni_group.draw(second_screen)
         print_score()
@@ -1322,6 +1347,7 @@ slime_group = pygame.sprite.Group() # create the alime boss attack sprite group
 runa_group = pygame.sprite.Group() # create the runa sprite group
 wall_group = pygame.sprite.Group() # create maze's wall sprite group
 ground_group = pygame.sprite.Group() # create ground sprite group
+trophy_group = pygame.sprite.Group() # create trophy sprite group
 
 # create all items sprite groups, one group for each maze, to make the items collectable only once
 cup_group_1 = pygame.sprite.Group()
@@ -1381,8 +1407,8 @@ while True: # game main loop
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=1
-        # last_maze=13
+        maze=13
+        last_maze=4
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
