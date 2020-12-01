@@ -256,18 +256,18 @@ class Boss(pygame.sprite.Sprite):
         self.rect[1] = BOSS_POS[1]
     
     def boss_damage(self):
-        print('boss lifes = ', (self.lifes-1))
+        global boss_alive, score
+        # print('boss lifes = ', (self.lifes-1))
         self.lifes-=1 # life damage
-        self.image = self.images[3] # damaged sprite 
+        self.image = self.images[3] # damaged sprite
+        if self.lifes<=0:
+            boss_alive = False
+            score+=53500
         
 
     def update(self):
-        global boss_alive, score
-        
         if self.lifes<=0: 
             self.image = self.images[2] # dead sprite
-            boss_alive = False
-            score+=53500
             
         else:
             if self.current_image<=1: self.image = self.images[0] # closed mouth sprite
@@ -297,7 +297,7 @@ class Boss(pygame.sprite.Sprite):
                 if wall_collide(boss_group)==True: # wall collide change direction
                     self.rect[0]+=BOSS_SPEED
                     self.direction='+'
-                    create_runa((198,231))
+                    create_runa((240,231))
                     create_slime()
                     create_slime()
                     create_slime()
@@ -1415,7 +1415,7 @@ def default_functions(): # run all the deafult functions to make the game run
         trophy_group.draw(second_screen)
         print_items()
         uni_group.draw(second_screen)
-        # shadow_group.draw(second_screen)
+        shadow_group.draw(second_screen)
         print_score()
         print_lifes()
         print_key()
@@ -1490,18 +1490,17 @@ while True: # game main loop
         uni_pos=[0,0] # global unicorn position to move between stages
         score = 0 # initial score
         lifes = 1 # initial unicorn lifes
-        key = 0 # game keys cont
+        key = 5 # game keys cont
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=1
+        maze=14
         item_sprite_group=1 # sprite group of the colletable items of each stage
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
         # this var is reduced by different values when the unicorn is moving or not
         # because the unicorn movement change the frame rate of the game, also the mobs speed
          
-
     if maze==1:
         reset_stage()
     while maze==1:    
