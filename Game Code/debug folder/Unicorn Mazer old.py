@@ -713,8 +713,7 @@ pygame.display.update()
 time.sleep(1)
 
 # canal1.play(tema)
-pygame.mixer.music.load('tema.wav')
-pygame.mixer.music.play(5)
+
 time.sleep(1)
 
 
