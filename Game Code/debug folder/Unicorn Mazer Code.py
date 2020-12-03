@@ -21,10 +21,27 @@ second_screen = screen.copy() # create the second screen
 
 # Game Text Font
 font_default = pygame.font.get_default_font() # get the default pygame font
+font75 = pygame.font.SysFont(font_default, 75) # set the font size to use later
 font50 = pygame.font.SysFont(font_default, 50) # set the font size to use later
 font40 = pygame.font.SysFont(font_default, 40) # set the font size to use later
 font35 = pygame.font.SysFont(font_default, 35) # set the font size to use later
 font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
+
+# Game System Music/Sound Effects
+pygame.mixer.init()
+c1=pygame.mixer.Channel(0) # channel 1
+c2=pygame.mixer.Channel(1) # channel 2
+
+# intro = pygame.mixer.Sound('intro.wav')
+# build_sound = pygame.mixer.Sound('build_sound.wav')
+# cof_sound = pygame.mixer.Sound('cof_sound.wav')
+# tema = pygame.mixer.Sound('tema.wav')
+# win = pygame.mixer.Sound('win.wav')
+# lose = pygame.mixer.Sound('lose.wav')
+
+# pygame.mixer.music.load('tema.wav')
+# pygame.mixer.music.play(5)
+# canal2.play(cof_sound)
 
 # Game Colors
 black = (0,0,0)
@@ -41,6 +58,7 @@ babby_blue =(173,216,230)
 brown = (150,75,0)
 wine = (94,33,41)
 
+# GAME OBJECT CLASSES
 class Unicorn(pygame.sprite.Sprite):
 
     def __init__(self, UNI_SIZE, UNI_POS):
@@ -381,15 +399,15 @@ class Runa(pygame.sprite.Sprite):
 
 class Wall(pygame.sprite.Sprite):
 
-    def __init__(self, wall_file, WALL_SIZE):
+    def __init__(self, wall_file, WALL_SIZE, WALL_POS):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load(wall_file).convert_alpha()
         self.image = pygame.transform.scale(self.image, (WALL_SIZE))
 
         self.rect = self.image.get_rect()
-        self.rect[0] = 150
-        self.rect[1] = 0
+        self.rect[0] = WALL_POS[0]
+        self.rect[1] = WALL_POS[1]
 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -481,7 +499,32 @@ class Shadow(pygame.sprite.Sprite):
         self.rect[0] = UNI_POS[0]-590
         self.rect[1] = UNI_POS[1]-590
 
-def num6dig(num):
+# GAME FUNCTIONS
+def intro(): # runs the game intro animation
+    global moving_up, moving_down, moving_left, moving_right, uni_pos, maze
+    erase()
+    screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+    pygame.display.flip() # update screen
+    time.sleep(2)
+    create_uni((80,80),(70,380))
+    create_wall('intro_wall.png',(800,500),(0,0))
+    while True:    
+        
+        event_reader()
+        moving_down=True
+        move_uni()
+        erase()
+        screen_print('view.png', (800,500), (0,0))
+        uni_group.draw(second_screen)
+        screen_print('intro_wall_2.png',(800,500),(0,0))
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+        pygame.display.flip() # update screen
+        time.sleep(0.001) # delay 
+        if uni_pos[1]>500: break # break when the unicorn falls
+    erase()
+    time.sleep(1)
+
+def num6dig(num): # keep a number aways with 6 numbers
     if num<0: num=0 # avoid negative score
 
     l = ['0','0','0','0','0','0']
@@ -704,7 +747,7 @@ def event_reader(): # read events using WAIT function
     elif event.type == pygame.KEYUP and event.key == pygame.K_LEFT: moving_left = False
 
 def death_screen_event_reader():
-    global height, width, dead, score_text, maze
+    global height, width
 
     event = pygame.event.wait(timeout=600)
 
@@ -722,57 +765,285 @@ def death_screen_event_reader():
         print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
     elif event.type == pygame.KEYDOWN:
-        if event.unicode.isalpha() and len(score_text)<=2:
-            score_text += event.unicode
-        elif event.key == K_BACKSPACE:
-            score_text = score_text[:-1]
-        elif event.key == K_RETURN: # ENTER key pressed
-            write_new_score(score_text) 
-            maze=0 
-            dead=False  
-
-        # KEEP ALL LETTERS AWAYS CAPSLOCK
-        if event.key == pygame.K_a:
-            score_text = score_text[:-1]
-            score_text=score_text+'A'
-        elif event.key == pygame.K_b:
-            score_text = score_text[:-1]
-            score_text=score_text+'B' 
-        elif event.key == pygame.K_c:
-            score_text = score_text[:-1]
-            score_text=score_text+'C'  
-        elif event.key == pygame.K_d:
-            score_text = score_text[:-1]
-            score_text=score_text+'D'      
-        elif event.key == pygame.K_e:
-            score_text = score_text[:-1]
-            score_text=score_text+'E'                
+        get_tag()
 
 def hurt_screen_event_reader(): # read all screen events in the death screen
     global height, width, hurt
 
-    event = pygame.event.wait(timeout=600)
+    for event in pygame.event.get():
 
-    if event.type == QUIT: # when the player close the game
-        pygame.display.quit() 
-        sys.exit(0)
+        if event.type == QUIT: # when the player close the game
+            pygame.display.quit() 
+            sys.exit(0)
 
-    elif event.type == VIDEORESIZE: # when the player resize the window
-        
-        new_size = event.dict['size'] # get the new size
-        new_size = list(new_size) # turns the tuple into a list
-        new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
-        height, width = new_size # update vars with the new size value
-        screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
-        print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+        elif event.type == VIDEORESIZE: # when the player resize the window
+            
+            new_size = event.dict['size'] # get the new size
+            new_size = list(new_size) # turns the tuple into a list
+            new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+            height, width = new_size # update vars with the new size value
+            screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+            print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
-    elif event.type == pygame.KEYDOWN:
-        reset_stage()
-        hurt=False
+        elif event.type == pygame.KEYDOWN:
+            reset_stage()
+            hurt=False
+                
+def get_tag_1(): # get the player name tag BY WRITING LETTERS to save the score in the ranking
+    global height, width, dead, score_text, maze, screen
 
-def end_game_screen():
     while True:
-        print('end')
+
+        erase()
+        print_score()
+        print_lifes()
+
+        second_screen.blit(font35.render('INSERT YOU TAG:', 1, yellow), (190,420))
+        second_screen.blit(font50.render(score_text, 1, yellow), (420,410))
+        second_screen.blit(font50.render(('- '+str(num6dig(score))), 1, yellow), (500,410))
+        
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+        pygame.display.flip() # update screen
+
+        
+        event = pygame.event.wait(timeout=600)
+
+        if event.type == QUIT: # when the player close the game
+            pygame.display.quit() 
+            sys.exit(0)
+
+        elif event.type == VIDEORESIZE: # when the player resize the window
+            
+            new_size = event.dict['size'] # get the new size
+            new_size = list(new_size) # turns the tuple into a list
+            new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+            height, width = new_size # update vars with the new size value
+            screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+            print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+        elif event.type == pygame.KEYDOWN:
+    
+            if event.unicode.isalpha() and len(score_text)<=2:
+                score_text += event.unicode
+            elif event.key == K_BACKSPACE:
+                score_text = score_text[:-1]
+            elif event.key == K_RETURN: # ENTER key pressed
+                write_new_score(score_text) 
+                maze=0 
+                dead=False  
+
+            # KEEP ALL LETTERS AWAYS CAPSLOCK
+            if event.key == pygame.K_a:
+                score_text = score_text[:-1]
+                score_text=score_text+'A'
+            elif event.key == pygame.K_b:
+                score_text = score_text[:-1]
+                score_text=score_text+'B' 
+            elif event.key == pygame.K_c:
+                score_text = score_text[:-1]
+                score_text=score_text+'C'  
+            elif event.key == pygame.K_d:
+                score_text = score_text[:-1]
+                score_text=score_text+'D'      
+            elif event.key == pygame.K_e:
+                score_text = score_text[:-1]
+                score_text=score_text+'E'                
+
+def get_tag_2(): # get the player name tag BY SELECTING LETTERS to save the score in the ranking
+    global height, width, dead, score_text, maze, screen
+    
+    score_text='AAA' # score tag text
+    score_text_index=[0,0,0] # score tag text
+    # alphabet list to help change letters in the score text
+    alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+
+    tag=True
+    while tag:
+        
+        erase()
+        print_score()
+        print_lifes()
+
+        second_screen.blit(font50.render('INSERT YOU RANKING TAG:', 1, yellow), (200,150))
+        second_screen.blit(font75.render(score_text, 1, yellow), (270,300))
+        second_screen.blit(font75.render(('- '+str(num6dig(score))), 1, yellow), (400,300))
+        screen_print('arrow_yellow_up.png', (23,23), (277,270))
+        screen_print('arrow_yellow_up.png', (23,23), (315,270))
+        screen_print('arrow_yellow_up.png', (23,23), (351,270))
+        screen_print('arrow_yellow_down.png', (23,23), (277,350))
+        screen_print('arrow_yellow_down.png', (23,23), (315,350))
+        screen_print('arrow_yellow_down.png', (23,23), (351,350))
+        
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+        pygame.display.flip() # update screen
+
+        
+        event = pygame.event.wait(timeout=600) # read events with timeout to control loop speed
+
+        if event.type == QUIT: # when the player close the game
+            pygame.display.quit() 
+            sys.exit(0)
+
+        elif event.type == VIDEORESIZE: # when the player resize the window
+            
+            new_size = event.dict['size'] # get the new size
+            new_size = list(new_size) # turns the tuple into a list
+            new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+            height, width = new_size # update vars with the new size value
+            screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+            print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+        elif event.type == pygame.KEYDOWN:
+    
+            if event.key == K_RETURN: # ENTER key pressed
+                write_new_score(score_text) # write score in ranking
+                maze=0 # return to start menu
+                tag=False # break the loop
+                
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            if ((height/2.9)<mouse_x<(height/2.66) and (width/1.879)<mouse_y<(width/1.694)):
+                var=score_text_index[0] # get the index of the letter
+                var+=1 # update the index
+                if var>25: var=0 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[0]=var # update the index list with the new index
+                score_text[0]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+
+            if ((height/2.9)<mouse_x<(height/2.66) and (width/1.445)<mouse_y<(width/1.326)):
+                var=score_text_index[0] # get the index of the letter
+                var-=1 # update the index
+                if var<0: var=25 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[0]=var # update the index list with the new index
+                score_text[0]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+
+            if ((height/2.57)<mouse_x<(height/2.346) and (width/1.879)<mouse_y<(width/1.694)):
+                var=score_text_index[1] # get the index of the letter
+                var+=1 # update the index
+                if var>25: var=0 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[1]=var # update the index list with the new index
+                score_text[1]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+
+            if ((height/2.57)<mouse_x<(height/2.346) and (width/1.445)<mouse_y<(width/1.326)):
+                var=score_text_index[1] # get the index of the letter
+                var-=1 # update the index
+                if var<0: var=25 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[1]=var # update the index list with the new index
+                score_text[1]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+
+            if ((height/2.298)<mouse_x<(height/2.122) and (width/1.879)<mouse_y<(width/1.694)):
+                var=score_text_index[2] # get the index of the letter
+                var+=1 # update the index
+                if var>25: var=0 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[2]=var # update the index list with the new index
+                score_text[2]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+                
+            if ((height/2.298)<mouse_x<(height/2.122) and (width/1.445)<mouse_y<(width/1.326)):
+                var=score_text_index[2] # get the index of the letter
+                var-=1 # update the index
+                if var<0: var=25 # control if the index is out of the interval
+                score_text = list(score_text) # turns the text into a list
+                score_text_index[2]=var # update the index list with the new index
+                score_text[2]=str(alphabet[var]) # update the text with the new letter
+                score_text = str(score_text[0])+str(score_text[1])+str(score_text[2]) # turn back the list into a text
+
+def start_menu(): # start menu looping
+    global height, width, hurt, maze, screen
+
+    aux=0
+    while maze==0:
+
+        time.sleep(1)
+
+        if aux==0:
+            screen_print('start_1.png', (800,500), (0,0))
+            aux=1
+        else:
+            screen_print('start_2.png', (800,500), (0,0))
+            aux=0
+
+        screen_print('uni_right.png', (200,200), (290,120))
+
+        screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+        pygame.display.flip() # update screen
+
+        for event in pygame.event.get():
+
+            if event.type == QUIT: # when the player close the game
+                pygame.display.quit() 
+                sys.exit(0)
+
+            elif event.type == VIDEORESIZE: # when the player resize the window
+                
+                new_size = event.dict['size'] # get the new size
+                new_size = list(new_size) # turns the tuple into a list
+                new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+                height, width = new_size # update vars with the new size value
+                screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+                print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+            elif event.type == pygame.KEYDOWN:
+                maze=1 # initial maze of the game
+                item_sprite_group=1 # sprite group of the colletable items of each stage
+                intro() # intro animation
+                
+def end_game_screen(): # game win screen
+    global height, width, hurt, maze, screen
+    erase()
+    time.sleep(0.5)
+    screen_print('boss_down.png', (800,800), (-250,170))
+    second_screen.blit(font75.render('YOU WIN', 1, yellow), (290,50))
+    second_screen.blit(font35.render('PRESS ANY KEY TO CONTINUE', 1, yellow), (200,120))
+    screen_print('cup.png', (70,70), (380,250))
+    screen_print('cup.png', (70,70), (420,250))
+    screen_print('cup.png', (70,70), (360,290))
+    screen_print('cup.png', (70,70), (400,290))
+    screen_print('cup.png', (70,70), (440,290))
+    screen_print('cup.png', (70,70), (340,330))
+    screen_print('cup.png', (70,70), (380,330))
+    screen_print('cup.png', (70,70), (420,330))
+    screen_print('cup.png', (70,70), (460,330))
+    screen_print('cup.png', (70,70), (320,370))
+    screen_print('cup.png', (70,70), (360,370))
+    screen_print('cup.png', (70,70), (400,370))
+    screen_print('cup.png', (70,70), (440,370))
+    screen_print('cup.png', (70,70), (480,370))
+    screen_print('uni_right.png', (90,90), (390,190))
+    screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
+    pygame.display.flip() # update screen
+
+    while True:
+
+        for event in pygame.event.get():
+
+            if event.type == QUIT: # when the player close the game
+                pygame.display.quit() 
+                sys.exit(0)
+
+            elif event.type == VIDEORESIZE: # when the player resize the window
+                
+                new_size = event.dict['size'] # get the new size
+                new_size = list(new_size) # turns the tuple into a list
+                new_size[1] = int(new_size[0]*0.625) # keep the window proporsions
+                height, width = new_size # update vars with the new size value
+                screen = pygame.display.set_mode((height,width),RESIZABLE) # recreate the screen with the new size
+                print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
+
+            elif event.type == pygame.KEYDOWN:
+                maze=0
+                get_tag_2()
+                break
 
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
@@ -795,7 +1066,7 @@ def mob_collide(): # check if some mob hits the unicorn
     else: 
         return False
 
-def check_death(): # check if the unicorn dies
+def check_death(): # check if the unicorn hurt or dies and print the hurted screen and the dead screen
     global lifes, dead, hurt, score, score_text
 
     if mob_collide()==True: # check if some mob collide with unicorn
@@ -807,7 +1078,6 @@ def check_death(): # check if the unicorn dies
         aux=0 
         while hurt: # hurted screen
             erase()
-            hurt_screen_event_reader()
             screen_print('hurt.png', (280,280), (340,40))
             second_screen.blit(font50.render('YOU JUST HURTED YOURSELF', 1, white), (200,350))
             if aux==0:
@@ -818,20 +1088,22 @@ def check_death(): # check if the unicorn dies
             print_lifes()
             screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
             pygame.display.flip() # update screen
+            time.sleep(0.7)
+            hurt_screen_event_reader()
 
         score_text=''
-        while dead: # dead screen
+        if dead==True: # dead screen
             erase()
-            death_screen_event_reader()
+            # death_screen_event_reader()
             screen_print('dead.png', (280,280), (300,40))
-            second_screen.blit(font50.render('GAME OVER', 1, red), (300,350))
-            second_screen.blit(font35.render('INSERT YOU TAG:', 1, yellow), (190,420))
-            second_screen.blit(font50.render(score_text, 1, yellow), (420,410))
-            second_screen.blit(font50.render(('- '+str(num6dig(score))), 1, yellow), (500,410))
+            second_screen.blit(font75.render('GAME OVER', 1, red), (300,350))
             print_score()
             print_lifes()
             screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
             pygame.display.flip() # update screen
+            time.sleep(7)
+            # get_tag_1()
+            get_tag_2()
 
 def check_items(): # check if the unicorn get the stage items
     global score, lifes, maze, key
@@ -949,7 +1221,7 @@ def check_items(): # check if the unicorn get the stage items
             score+=1000
             lifes+=1
     
-def move_uni():
+def move_uni(): # check event reader variables and move the unicorn
     global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos, clock, maze
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
@@ -963,7 +1235,7 @@ def move_uni():
     if maze==15 or maze==12:
         shadow_group.update(uni_pos)
 
-def move_mobs():
+def move_mobs(): # trigger to move game mobs 
     global update_screen, clock
 
     if clock<0:
@@ -975,46 +1247,46 @@ def move_mobs():
         update_screen=True
         clock=1000  
 
-def create_uni(UNI_SIZE, UNI_POS):
+def create_uni(UNI_SIZE, UNI_POS): # create a object unicorn
     # UNI_SIZE (25,25) for small mazes and (10,10) for big mazes
     uni = Unicorn(UNI_SIZE, UNI_POS) 
     uni_group.add(uni)
 
-def create_bull(BULL_SIZE, BULL_POS):
+def create_bull(BULL_SIZE, BULL_POS): # create a object bull
     bull = Bull(BULL_SIZE, BULL_POS)
     bull_group.add(bull)
 
-def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS):
+def create_wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS): # create a object wolf
     wolf = Wolf(WOLF_SIZE, WOLF_POS, WOLF_AXIS)
     wolf_group.add(wolf)
 
-def create_boss():
+def create_boss(): # create a object boss
     boss = Boss()
     boss_group.add(boss)
     return boss # return the boss object for use later in the boss_damage function
 
-def create_slime():
+def create_slime(): # create a object slime (boss attack)
     slime = Slime()
     slime_group.add(slime)
 
-def create_runa(RUNA_POS):
+def create_runa(RUNA_POS): # create a object rune (boss life)
     runa = Runa(RUNA_POS)
     runa_group.add(runa)
 
-def create_wall(wall_file, WALL_SIZE):
-    wall = Wall(wall_file, WALL_SIZE)
+def create_wall(wall_file, WALL_SIZE, WALL_POS=(150,0)): # create a object wall for the mazes wall
+    wall = Wall(wall_file, WALL_SIZE, WALL_POS)
     wall_group.add(wall)
 
-def create_shadow():
+def create_shadow(): # create a object shadow for dark mazes
     global uni_pos
     shadow = Shadow(uni_pos)
     shadow_group.add(shadow)
 
-def create_ground(ground_file):
+def create_ground(ground_file): # create a object ground 
     ground = Wall(ground_file)
     ground_group.add(ground)
 
-def create_cup(CUP_SIZE, CUP_POS, MAZE):
+def create_cup(CUP_SIZE, CUP_POS, MAZE):  # create a object cupcake
     cup = Cup(CUP_SIZE, CUP_POS)
 
     if MAZE==1: cup_group_1.add(cup)
@@ -1033,7 +1305,7 @@ def create_cup(CUP_SIZE, CUP_POS, MAZE):
     elif MAZE==14: cup_group_14.add(cup)
     elif MAZE==15: cup_group_15.add(cup)
 
-def create_cof(COF_SIZE, COF_POS, MAZE):
+def create_cof(COF_SIZE, COF_POS, MAZE): # create a object coffee
     cof = Cof(COF_SIZE, COF_POS)
     
     if MAZE==1: cof_group_1.add(cof)
@@ -1052,7 +1324,7 @@ def create_cof(COF_SIZE, COF_POS, MAZE):
     elif MAZE==14: cof_group_14.add(cof)
     elif MAZE==15: cof_group_15.add(cof)
 
-def create_key(KEY_SIZE, KEY_POS, MAZE):
+def create_key(KEY_SIZE, KEY_POS, MAZE): # create a object key
     key = Key(KEY_SIZE, KEY_POS)
     
     if MAZE==2: key_group_2.add(key)
@@ -1061,7 +1333,7 @@ def create_key(KEY_SIZE, KEY_POS, MAZE):
     elif MAZE==8: key_group_8.add(key)
     elif MAZE==12: key_group_12.add(key)
 
-def create_trophy(TROPHY_SIZE, TROPHY_POS):
+def create_trophy(TROPHY_SIZE, TROPHY_POS):  # create a object trophy
 
     trophy = Trophy(TROPHY_SIZE,TROPHY_POS)
     trophy_group.add(trophy)
@@ -1480,9 +1752,8 @@ last_maze = 0 # keep the last maze, to control change between stages
 
 while True: # game main loop
     
-    if maze==0: # start menu
-        
-        # INITIAL GAME VARS
+    if maze==0: # INITIAL GAME VARS and start menu
+
         hurt = False # damaged unicorn var
         dead = False # game over var
         boss_alive = True # keep info if the boss dies
@@ -1490,17 +1761,19 @@ while True: # game main loop
         uni_pos=[0,0] # global unicorn position to move between stages
         score = 0 # initial score
         lifes = 1 # initial unicorn lifes
-        key = 5 # game keys cont
+        key = 0 # game keys cont
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
-        maze=14
-        item_sprite_group=1 # sprite group of the colletable items of each stage
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
         # this var is reduced by different values when the unicorn is moving or not
         # because the unicorn movement change the frame rate of the game, also the mobs speed
-         
+
+        erase()
+        time.sleep(2)
+        start_menu()  
+
     if maze==1:
         reset_stage()
     while maze==1:    
