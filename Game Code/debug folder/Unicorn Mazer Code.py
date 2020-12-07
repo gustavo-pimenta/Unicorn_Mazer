@@ -18,6 +18,8 @@ width = 500 # initial width of the screen when the game opens
 height = 800 # initial height of the screen when the game opens
 screen = pygame.display.set_mode((height,width),RESIZABLE) # create the screen
 second_screen = screen.copy() # create the second screen
+pygame.display.set_caption("Unicorn Mazer")
+pygame.display.set_icon(pygame.image.load('uni_right.png'))
 
 # Game Text Font
 font_default = pygame.font.get_default_font() # get the default pygame font
@@ -29,19 +31,22 @@ font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
 
 # Game System Music/Sound Effects
 pygame.mixer.init()
-c1=pygame.mixer.Channel(0) # channel 1
-c2=pygame.mixer.Channel(1) # channel 2
+c1=pygame.mixer.Channel(0) # channel 1 for music
+c2=pygame.mixer.Channel(1) # channel 2 for sound effects
+c1.set_volume(0.7)
+c2.set_volume(0.5)
 
-# intro = pygame.mixer.Sound('intro.wav')
-# build_sound = pygame.mixer.Sound('build_sound.wav')
-# cof_sound = pygame.mixer.Sound('cof_sound.wav')
-# tema = pygame.mixer.Sound('tema.wav')
-# win = pygame.mixer.Sound('win.wav')
-# lose = pygame.mixer.Sound('lose.wav')
-
-# pygame.mixer.music.load('tema.wav')
-# pygame.mixer.music.play(5)
-# canal2.play(cof_sound)
+start_music = pygame.mixer.Sound('start.wav')
+theme_1 = pygame.mixer.Sound('theme_1.wav')
+theme_2 = pygame.mixer.Sound('theme_2.wav')
+key_sound = pygame.mixer.Sound('key.wav')
+hurt_sound = pygame.mixer.Sound('hurt.wav')
+dead_sound = pygame.mixer.Sound('game_over.wav')
+cup_sound = pygame.mixer.Sound('cup.wav')
+cof_sound = pygame.mixer.Sound('coffee.wav')
+boss_sound = pygame.mixer.Sound('boss_sound.wav')
+boss_damage = pygame.mixer.Sound('boss_damage.wav')
+win_sound = pygame.mixer.Sound('key.wav')
 
 # Game Colors
 black = (0,0,0)
@@ -59,7 +64,7 @@ brown = (150,75,0)
 wine = (94,33,41)
 
 # GAME OBJECT CLASSES
-class Unicorn(pygame.sprite.Sprite):
+class Unicorn(pygame.sprite.Sprite): 
 
     def __init__(self, UNI_SIZE, UNI_POS):
         pygame.sprite.Sprite.__init__(self)
@@ -81,31 +86,66 @@ class Unicorn(pygame.sprite.Sprite):
         self.rect[1] = UNI_POS[1]
 
     def update(self, moving_up, moving_down, moving_left, moving_right):
-
-        SPEED = 2
+        global maze
+        if maze==0: SPEED = 6
+        else: SPEED = 2
 
         if moving_up == True: 
             self.rect[1] -= SPEED # move up 
-            if wall_collide(uni_group)==True:
+            uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+            if wall_collide(uni_hit_box_group)==True:
                 self.rect[1] += SPEED # undo the move if hit a wall
+                uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+        
         if moving_down == True: 
             self.rect[1] += SPEED # move down
-            if wall_collide(uni_group)==True:
+            uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+            if wall_collide(uni_hit_box_group)==True:
                 self.rect[1] -= SPEED # undo the move if hit a wall
+                uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+        
         if moving_left==True:
             self.rect[0] -= SPEED # move left
+            uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
             self.image = self.images[1] # change sprite
-            if wall_collide(uni_group)==True:
+            if wall_collide(uni_hit_box_group)==True:
                 self.rect[0] += SPEED # undo the move if hit a wall
+                uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+        
         if moving_right==True:
             self.rect[0] += SPEED # move right
+            uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
             self.image = self.images[0] # change sprite
-            if wall_collide(uni_group)==True:
+            if wall_collide(uni_hit_box_group)==True:
                 self.rect[0] -= SPEED # undo the move if hit a wall
+                uni_hit_box_group.update((self.rect[0],self.rect[1])) # update the hit box position to follow the unicorn
+        
     
     def get_UNI_POS(self): # return the current position of the unicorn
-        pos = [self.rect[0],self.rect[1]]
-        return pos
+        uni_pos = [self.rect[0],self.rect[1]]
+        return uni_pos
+
+class Uni_hit_box(pygame.sprite.Sprite): 
+
+    def __init__(self, UNI_SIZE, UNI_POS):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load('uni_hit_box.png').convert_alpha()]
+        self.images[0] = pygame.transform.scale(self.images[0], UNI_SIZE)
+    
+
+        self.image = pygame.image.load('uni_hit_box.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, UNI_SIZE)
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = UNI_POS[0]
+        self.rect[1] = UNI_POS[1]
+
+    def update(self, UNI_POS):
+
+        self.rect[0] = UNI_POS[0]
+        self.rect[1] = UNI_POS[1]
 
 class Bull(pygame.sprite.Sprite):
 
@@ -275,6 +315,7 @@ class Boss(pygame.sprite.Sprite):
     
     def boss_damage(self):
         global boss_alive, score
+        c2.play(boss_damage)
         # print('boss lifes = ', (self.lifes-1))
         self.lifes-=1 # life damage
         self.image = self.images[3] # damaged sprite
@@ -282,7 +323,6 @@ class Boss(pygame.sprite.Sprite):
             boss_alive = False
             score+=53500
         
-
     def update(self):
         if self.lifes<=0: 
             self.image = self.images[2] # dead sprite
@@ -300,6 +340,7 @@ class Boss(pygame.sprite.Sprite):
                 if wall_collide(boss_group)==True: # wall collide change direction
                     self.rect[0]-=BOSS_SPEED
                     self.direction='-'
+                    c2.play(boss_sound)
                     create_runa((726,231))
                     create_slime()
                     create_slime()
@@ -315,6 +356,7 @@ class Boss(pygame.sprite.Sprite):
                 if wall_collide(boss_group)==True: # wall collide change direction
                     self.rect[0]+=BOSS_SPEED
                     self.direction='+'
+                    c2.play(boss_sound)
                     create_runa((240,231))
                     create_slime()
                     create_slime()
@@ -500,13 +542,14 @@ class Shadow(pygame.sprite.Sprite):
         self.rect[1] = UNI_POS[1]-590
 
 # GAME FUNCTIONS
+
 def intro(): # runs the game intro animation
     global moving_up, moving_down, moving_left, moving_right, uni_pos, maze
     erase()
     screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
     pygame.display.flip() # update screen
     time.sleep(2)
-    create_uni((80,80),(70,380))
+    create_uni((80,80),(150,380))
     create_wall('intro_wall.png',(800,500),(0,0))
     while True:    
         
@@ -961,17 +1004,20 @@ def get_tag_2(): # get the player name tag BY SELECTING LETTERS to save the scor
 def start_menu(): # start menu looping
     global height, width, hurt, maze, screen
 
+    c1.play(start_music, loops=30, fade_ms=2000) # start menu music
+
     aux=0
     while maze==0:
 
-        time.sleep(1)
+        time.sleep(0.1)
 
-        if aux==0:
+        if aux<0:
             screen_print('start_1.png', (800,500), (0,0))
-            aux=1
+            aux+=1
         else:
             screen_print('start_2.png', (800,500), (0,0))
-            aux=0
+            aux+=1
+        if aux>7: aux = -7
 
         screen_print('uni_right.png', (200,200), (290,120))
 
@@ -994,10 +1040,12 @@ def start_menu(): # start menu looping
                 print('SCREEN RESOLUTION = (', width, ',', height, ')') # print output 
 
             elif event.type == pygame.KEYDOWN:
+                intro() # intro animation
                 maze=1 # initial maze of the game
                 item_sprite_group=1 # sprite group of the colletable items of each stage
-                intro() # intro animation
                 
+    c1.stop() # stop start menu music
+
 def end_game_screen(): # game win screen
     global height, width, hurt, maze, screen
     erase()
@@ -1023,7 +1071,8 @@ def end_game_screen(): # game win screen
     screen.blit(pygame.transform.scale(second_screen,(height,width)), (0, 0)) # draw the second screen items into the main screen
     pygame.display.flip() # update screen
 
-    while True:
+    win=True
+    while win:
 
         for event in pygame.event.get():
 
@@ -1043,7 +1092,20 @@ def end_game_screen(): # game win screen
             elif event.type == pygame.KEYDOWN:
                 maze=0
                 get_tag_2()
-                break
+                win=False
+
+def music_loop(): # make the game music play, change and loop
+
+    queue = c1.get_queue()
+
+    if queue==None:
+
+        actual_music = c1.get_sound()
+
+        if actual_music==None or actual_music==theme_2:
+            c1.queue(theme_1)
+        elif actual_music==theme_1:
+            c1.queue(theme_2)
 
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
@@ -1072,8 +1134,12 @@ def check_death(): # check if the unicorn hurt or dies and print the hurted scre
     if mob_collide()==True: # check if some mob collide with unicorn
         lifes-=1 
         score-=7000  
-        if lifes>0: hurt=True # hurt loses a heart
-        else: dead=True # dead is game over
+        if lifes>0: 
+            hurt=True # hurt loses a heart
+            c2.play(hurt_sound)
+        else: 
+            dead=True # dead is game over
+            c2.play(dead_sound)
         
         aux=0 
         while hurt: # hurted screen
@@ -1110,119 +1176,127 @@ def check_items(): # check if the unicorn get the stage items
     
     if maze==1:
         if (pygame.sprite.groupcollide(uni_group, cup_group_1, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_1, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
     
     elif maze==2:
         if (pygame.sprite.groupcollide(uni_group, cup_group_2, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_2, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
         elif (pygame.sprite.groupcollide(uni_group, key_group_2, False, True, pygame.sprite.collide_mask)):
+            c2.play(key_sound)
             key+=1
             score+=3000
 
-    # elif maze==3:  MAZE 3 HAS NO ITEMS
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_3, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     elif (pygame.sprite.groupcollide(uni_group, cof_group_3, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    
     elif maze==4:
         if (pygame.sprite.groupcollide(uni_group, cup_group_4, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_4, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
     
     elif maze==5:
         if (pygame.sprite.groupcollide(uni_group, cup_group_5, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_5, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
         elif (pygame.sprite.groupcollide(uni_group, key_group_5, False, True, pygame.sprite.collide_mask)):
+            c2.play(key_sound)
             key+=1
             score+=3000
 
     elif maze==6:
         if (pygame.sprite.groupcollide(uni_group, cup_group_6, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_6, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
 
     elif maze==7:
         if (pygame.sprite.groupcollide(uni_group, cup_group_7, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_7, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
         elif (pygame.sprite.groupcollide(uni_group, key_group_7, False, True, pygame.sprite.collide_mask)):
+            c2.play(key_sound)
             key+=1
             score+=3000
 
     elif maze==8:
         if (pygame.sprite.groupcollide(uni_group, cup_group_8, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_8, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
         elif (pygame.sprite.groupcollide(uni_group, key_group_8, False, True, pygame.sprite.collide_mask)):
+            c2.play(key_sound)
             key+=1
             score+=3000
     
     elif maze==9:
         if (pygame.sprite.groupcollide(uni_group, cup_group_9, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_9, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
 
-    # elif maze==10:  MAZE 10 HAS NO ITEMS
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_10, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     elif (pygame.sprite.groupcollide(uni_group, cof_group_10, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
-    
     elif maze==11:
         if (pygame.sprite.groupcollide(uni_group, cup_group_11, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_11, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
             score+=1000
             lifes+=1
     
     elif maze==12: # maze 12 has only a key
         if (pygame.sprite.groupcollide(uni_group, key_group_12, False, True, pygame.sprite.collide_mask)):
+            c2.play(key_sound)
+            shadow_group.empty() # remove the shadow
             key+=1
             score+=3000
 
     elif maze==13:
         if (pygame.sprite.groupcollide(uni_group, trophy_group, False, True, pygame.sprite.collide_mask)):
             score+=3000
+            c2.play(win_sound)
             end_game_screen()
-
-    # elif maze==14: # MAZE 14 HAS NO ITEMS
-    #     if (pygame.sprite.groupcollide(uni_group, cup_group_14, False, True, pygame.sprite.collide_mask)): 
-    #         score+=1500
-    #     elif (pygame.sprite.groupcollide(uni_group, cof_group_14, False, True, pygame.sprite.collide_mask)):
-    #         score+=1000
-    #         lifes+=1
 
     elif maze==15:
         if (pygame.sprite.groupcollide(uni_group, cup_group_15, False, True, pygame.sprite.collide_mask)): 
+            c2.play(cup_sound)
             score+=1500
         elif (pygame.sprite.groupcollide(uni_group, cof_group_15, False, True, pygame.sprite.collide_mask)):
+            c2.play(cof_sound)
+            shadow_group.empty() # remove the shadow
             score+=1000
             lifes+=1
     
 def move_uni(): # check event reader variables and move the unicorn
     global moving_up, moving_down, moving_left, moving_right, update_screen, uni_pos, clock, maze
+
     try: uni_group.update(moving_up, moving_down, moving_left, moving_right) # send info to update move
     except: print('ALERT: MOVING ERROR')
 
@@ -1248,9 +1322,13 @@ def move_mobs(): # trigger to move game mobs
         clock=1000  
 
 def create_uni(UNI_SIZE, UNI_POS): # create a object unicorn
-    # UNI_SIZE (25,25) for small mazes and (10,10) for big mazes
     uni = Unicorn(UNI_SIZE, UNI_POS) 
     uni_group.add(uni)
+    create_uni_hit_box(UNI_SIZE, UNI_POS)
+
+def create_uni_hit_box(UNI_SIZE, UNI_POS): # create a object unicorn
+    uni_hit_box = Uni_hit_box(UNI_SIZE, UNI_POS) 
+    uni_hit_box_group.add(uni_hit_box)
 
 def create_bull(BULL_SIZE, BULL_POS): # create a object bull
     bull = Bull(BULL_SIZE, BULL_POS)
@@ -1659,6 +1737,7 @@ def print_items(): # draw the collectable iten from each maze in the screen
 
 def clear_groups(): # clear all sprites in all groups, except for the collectable items groups
     uni_group.empty()
+    uni_hit_box_group.empty()
     bull_group.empty()
     wolf_group.empty()
     wall_group.empty()
@@ -1674,6 +1753,8 @@ def default_functions(): # run all the deafult functions to make the game run
     event_reader()
     move_mobs()
     move_uni()
+
+    music_loop()
 
     if update_screen == True:
         update_screen=False
@@ -1698,6 +1779,7 @@ def default_functions(): # run all the deafult functions to make the game run
     check_items()
      
 uni_group = pygame.sprite.Group() # create unicorn sprite group
+uni_hit_box_group = pygame.sprite.Group() #create a group for the hit box of the unicorn
 bull_group = pygame.sprite.Group() # create bull sprite group
 wolf_group = pygame.sprite.Group() # create wolf sprite group
 boss_group = pygame.sprite.Group() # create the boss sprite group
@@ -1762,17 +1844,19 @@ while True: # game main loop
         score = 0 # initial score
         lifes = 1 # initial unicorn lifes
         key = 0 # game keys cont
+        
         score_text='' # initial ranking text var
         break_move() # start the game with all movement stoped
         reset_items() # reset all the collectable items
+        clear_groups() # clear sprite from old games
 
         clock = 1000 # clock is the variable that controls the movement speed of the game mobs
         # this var is reduced by different values when the unicorn is moving or not
         # because the unicorn movement change the frame rate of the game, also the mobs speed
 
         erase()
-        time.sleep(2)
-        start_menu()  
+        time.sleep(1)
+        start_menu() 
 
     if maze==1:
         reset_stage()
