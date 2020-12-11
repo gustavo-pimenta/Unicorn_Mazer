@@ -8,7 +8,7 @@
 
 Unicorn Mazer first version was made in 2019, only with Python and Pygame.
 The game was a personal project, designed pixel by pixel in the hardest way.
-A new (and much better) version start to be developed in 2020 october and will be released as soon as possible.
+A new (and much better) version was developed in 2020, using object-oriented programming. 
 
 All pixel art of the game was made by myself in the pixel art tool: https://www.pixilart.com/
 All game musics and sound effects were free obtained from the website https://freesound.org/
@@ -18,7 +18,7 @@ All game musics and sound effects were free obtained from the website https://fr
 
 ## Team
 
-* Gustavo Pimenta - Game Developer / Python Coder / 
+* Gustavo Pimenta - Computer Engineering / Game Developer / Python Coder 
 
 
 
