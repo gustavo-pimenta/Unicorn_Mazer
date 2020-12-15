@@ -1,61 +1,163 @@
 import cx_Freeze
 from cx_Freeze import *
 
-
-# CONFIGURAÇÕES DO MSI
-# shortcut_table = [
-#     ("Unicorn Mazer",        # Shortcut
-#      "DesktopFolder",          # Directory_
-#      "Unicorn Mazer",           # Name
-#      "C:/Program Files (x86)/Unicorn Mazer",              # Component_
-#      "C:/Program Files (x86)/Unicorn Mazer/Unicorn Mazer.exe",# Target
-#      None,                     # Arguments
-#      None,                     # Description
-#      None,                     # Hotkey
-#      None,                     # Icon
-#      None,                     # IconIndex
-#      None,                     # ShowCmd
-#      "C:/Program Files (x86)/Unicorn Mazer"               # WkDir
-#      )
-#     ]
-
-
-# shortcut_table = [
-#     ("DesktopShortcut",        # Shortcut
-#      "DesktopFolder",          # Directory_
-#      "Unicorn Mazer",           # Name
-#      "TARGETDIR",              # Component_
-#      "[TARGETDIR]Unicorn Mazer.exe",# Target
-#      None,                     # Arguments
-#      None,                     # Description
-#      None,                     # Hotkey
-#      None,                     # Icon
-#      None,                     # IconIndex
-#      None,                     # ShowCmd
-#      'ProgramFiles64Folder'               # WkDir
-#      )
-# ]
-
-
-# msi_data = {"Shortcut": shortcut_table}
-
 build_msi_options = {
-    # 'data': msi_data,
-    'include_files': ['big_cof.png','big_cup.png','big_mino.png','big_uni.png','big_uni_right.png','big_uni_left.png',
-    'build_sound.wav','cof.png','cof_sound.wav','cup.png','dead.png','death.wav','giant_cup.png','icone.ico','intro.wav',
-    'lose.wav','mino.png','start_image.png','tema.wav','uni.png','uni.png','uni_left.png','uni_right.png','win.wav'],
+    'packages': ['pygame', 'time', 'random', 'sys', 'csv'],
 
+    'include_files': [  
+        'arrow_yellow_down.png',
+        'arrow_yellow_up.png',
+        'boss.png',
+        'boss_2.png',
+        'boss_3.png',
+        'boss_4.png',
+        'boss_damage.wav',
+        'boss_down.png',
+        'boss_sound.wav',
+        'bull.png',
+        'bull_2.png',
+        'bull_3.png',
+        'cof.png',
+        'coffee.wav',
+        'cof_2.png',
+        'cup.png',
+        'cup.wav',
+        'dead.png',
+        'game_over.wav',
+        'ground.png',
+        'ground2.png',
+        'ground3.png',
+        'ground_2.png',
+        'heart.png',
+        'heart_2.png',
+        'hurt.png',
+        'hurt.wav',
+        'intro_wall.png',
+        'intro_wall_2.png',
+        'key.png',
+        'key.wav',
+        'key_2.png',
+        'key_3.png',
+        'maps.png',
+        'maze_1.png',
+        'maze_10.png',
+        'maze_11.png',
+        'maze_12.png',
+        'maze_13.1.png',
+        'maze_13.2.png',
+        'maze_14.png',
+        'maze_15.png',
+        'maze_2.png',
+        'maze_3.png',
+        'maze_4.png',
+        'maze_5.png',
+        'maze_6.png',
+        'maze_7.png',
+        'maze_8.png',
+        'maze_9.png',
+        'runa.png',
+        'score.csv',
+        'shadow.png',
+        'slime.png',
+        'slime_2.png',
+        'slime_3.png',
+        'slime_4.png',
+        'start.wav',
+        'start_1.png',
+        'start_2.png',
+        'theme_1.wav',
+        'theme_2.wav',
+        'trophy.png',
+        'uni_hit_box.png',
+        'uni_left.png',
+        'uni_right.png',
+        'view.png',
+        'wolf.png',
+        'wolf_2.png',
+        'wolf_3.png',
+        'wolf_4.png',
+        'icon.ico'
+    ],
 }
 
-
-# CONFIGURAÇÕES DO EXE
 build_exe_options = {
-    'packages': ['pygame', 'random','sys'],
+    'packages': ['pygame', 'time', 'random', 'sys', 'csv'],
 
-    'include_files': ['big_cof.png','big_cup.png','big_mino.png','big_uni.png','big_uni_right.png','big_uni_left.png',
-    'build_sound.wav','cof.png','cof_sound.wav','cup.png','dead.png','death.wav','giant_cup.png','icone.ico','intro.wav',
-    'lose.wav','mino.png','start_image.png','tema.wav','uni.png','uni.png','uni_left.png','uni_right.png','win.wav'],
-    
+    'include_files': [  
+        'arrow_yellow_down.png',
+        'arrow_yellow_up.png',
+        'boss.png',
+        'boss_2.png',
+        'boss_3.png',
+        'boss_4.png',
+        'boss_damage.wav',
+        'boss_down.png',
+        'boss_sound.wav',
+        'bull.png',
+        'bull_2.png',
+        'bull_3.png',
+        'cof.png',
+        'coffee.wav',
+        'cof_2.png',
+        'cup.png',
+        'cup.wav',
+        'dead.png',
+        'game_over.wav',
+        'ground.png',
+        'ground2.png',
+        'ground3.png',
+        'ground_2.png',
+        'heart.png',
+        'heart_2.png',
+        'hurt.png',
+        'hurt.wav',
+        'intro_wall.png',
+        'intro_wall_2.png',
+        'key.png',
+        'key.wav',
+        'key_2.png',
+        'key_3.png',
+        'maps.png',
+        'maze_1.png',
+        'maze_10.png',
+        'maze_11.png',
+        'maze_12.png',
+        'maze_13.1.png',
+        'maze_13.2.png',
+        'maze_14.png',
+        'maze_15.png',
+        'maze_2.png',
+        'maze_3.png',
+        'maze_4.png',
+        'maze_5.png',
+        'maze_6.png',
+        'maze_7.png',
+        'maze_8.png',
+        'maze_9.png',
+        'runa.png',
+        'score.csv',
+        'shadow.png',
+        'slime.png',
+        'slime_2.png',
+        'slime_3.png',
+        'slime_4.png',
+        'start.wav',
+        'start_1.png',
+        'start_2.png',
+        'theme_1.wav',
+        'theme_2.wav',
+        'trophy.png',
+        'uni_hit_box.png',
+        'uni_left.png',
+        'uni_right.png',
+        'view.png',
+        'wolf.png',
+        'wolf_2.png',
+        'wolf_3.png',
+        'wolf_4.png',
+        'icon.ico'
+    ],
+
     'include_msvcr': True,
 }
 
@@ -73,9 +175,9 @@ setup(
 
             Executable(
 
-                "Unicorn Mazer.py",
-                icon="icone.ico",
-                base = "Win32GUI",
+                'Unicorn Mazer Code.pyw',
+                icon='icon.ico',
+                base = 'Win32GUI',
                 # shortcutName="Unicorn Mazer",
                 # shortcutDir="DesktopFolder"
 
