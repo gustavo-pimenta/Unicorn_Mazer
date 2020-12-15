@@ -2,7 +2,7 @@ import cx_Freeze
 from cx_Freeze import *
 
 build_msi_options = {
-    'packages': ['pygame', 'time', 'random', 'sys', 'csv'],
+    'install_icon': 'icon.ico',
 
     'include_files': [  
         'arrow_yellow_down.png',
@@ -76,7 +76,8 @@ build_msi_options = {
         'wolf_2.png',
         'wolf_3.png',
         'wolf_4.png',
-        'icon.ico'
+        'icon.ico',
+        'Unicorn Mazer.py'
     ],
 }
 
@@ -155,7 +156,8 @@ build_exe_options = {
         'wolf_2.png',
         'wolf_3.png',
         'wolf_4.png',
-        'icon.ico'
+        'icon.ico',
+        'Unicorn Mazer.py'
     ],
 
     'include_msvcr': True,
@@ -175,11 +177,11 @@ setup(
 
             Executable(
 
-                'Unicorn Mazer Code.pyw',
+                "Unicorn Mazer.py",
                 icon='icon.ico',
                 base = 'Win32GUI',
-                # shortcutName="Unicorn Mazer",
-                # shortcutDir="DesktopFolder"
+                shortcutName="Unicorn Mazer",
+                shortcutDir="DesktopFolder"
 
             )
     ]
