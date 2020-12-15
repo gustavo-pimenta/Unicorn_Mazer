@@ -12,6 +12,7 @@ The game was a personal project, designed pixel by pixel in the hardest way.
 A new (and much better) version was developed in 2020, using object-oriented programming. 
 
 All pixel art of the game was made by myself in the pixel art tool: https://www.pixilart.com/
+
 All game musics and sound effects were free obtained from the website https://freesound.org/
 
 
