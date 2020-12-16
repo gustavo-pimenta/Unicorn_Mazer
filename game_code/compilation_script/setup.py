@@ -2,7 +2,7 @@ import cx_Freeze
 from cx_Freeze import *
 
 build_msi_options = {
-    'install_icon': 'icon.ico',
+    'install_icon': 'ico.ico',
 
     'include_files': [  
         'arrow_yellow_down.png',
@@ -76,7 +76,7 @@ build_msi_options = {
         'wolf_2.png',
         'wolf_3.png',
         'wolf_4.png',
-        'icon.ico',
+        'ico.ico',
         'Unicorn Mazer.py'
     ],
 }
@@ -156,7 +156,7 @@ build_exe_options = {
         'wolf_2.png',
         'wolf_3.png',
         'wolf_4.png',
-        'icon.ico',
+        'ico.ico',
         'Unicorn Mazer.py'
     ],
 
@@ -178,7 +178,7 @@ setup(
             Executable(
 
                 "Unicorn Mazer.py",
-                icon='icon.ico',
+                icon='ico.ico',
                 base = 'Win32GUI',
                 shortcutName="Unicorn Mazer",
                 shortcutDir="DesktopFolder"
