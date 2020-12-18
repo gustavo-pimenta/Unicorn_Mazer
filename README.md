@@ -30,7 +30,8 @@ To compile the game, just set all the configuration in the setup, place all the 
 ### Tutorial video about the compilation:
 How to Convert Python to Exe and Create An Installer - https://www.youtube.com/watch?v=RrpvNvklmFA
 
-### cx_Freeze MSI shortcut bug resolution - https://stackoverflow.com/questions/38637337/cx-freeze-shortcutdir-gives-error
+### cx_Freeze MSI shortcut bug resolution 
+https://stackoverflow.com/questions/38637337/cx-freeze-shortcutdir-gives-error
 The cx_Freeze lib, used to compile the game, has a bug when the MSI creates the desktop shortcut.
 To fix this bug we have to enter in the "windist.py" file inside the cx_Freeze folder and make this change in the line 61:
 CHANGE "None, None, None, None)])" TO "None, None, None, "TARGETDIR")])"
