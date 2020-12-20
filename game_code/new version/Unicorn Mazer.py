@@ -33,12 +33,19 @@ font25 = pygame.font.SysFont(font_default, 25) # set the font size to use later
 pygame.mixer.init()
 c1=pygame.mixer.Channel(0) # channel 1 for music
 c2=pygame.mixer.Channel(1) # channel 2 for sound effects
-c1.set_volume(0.7)
-c2.set_volume(0.5)
+c1.set_volume(0.7) # channel 1 volume
+c2.set_volume(0.5) # channel 2 volume
 
+# load all game musics and sound effects to be used later
 start_music = pygame.mixer.Sound('start.wav')
 theme_1 = pygame.mixer.Sound('theme_1.wav')
 theme_2 = pygame.mixer.Sound('theme_2.wav')
+theme_3 = pygame.mixer.Sound('theme_3.wav')
+theme_4 = pygame.mixer.Sound('theme_4.wav')
+theme_5 = pygame.mixer.Sound('theme_5.wav')
+theme_6 = pygame.mixer.Sound('theme_6.wav')
+theme_7 = pygame.mixer.Sound('theme_7.wav')
+theme_8 = pygame.mixer.Sound('theme_8.wav')
 key_sound = pygame.mixer.Sound('key.wav')
 hurt_sound = pygame.mixer.Sound('hurt.wav')
 dead_sound = pygame.mixer.Sound('game_over.wav')
@@ -1166,16 +1173,28 @@ def end_game_screen(): # game win screen
 
 def music_loop(): # make the game music play, change and loop
 
-    queue = c1.get_queue()
+    queue = c1.get_queue() # get the music queue in the channel 1
 
-    if queue==None:
+    if queue==None: # if empty queue
 
-        actual_music = c1.get_sound()
+        actual_music = c1.get_sound() # get the actual music playing to set the next music
 
-        if actual_music==None or actual_music==theme_2:
+        if actual_music==None or actual_music==theme_8:
             c1.queue(theme_1)
         elif actual_music==theme_1:
             c1.queue(theme_2)
+        elif actual_music==theme_2:
+            c1.queue(theme_3)
+        elif actual_music==theme_3:
+            c1.queue(theme_4)
+        elif actual_music==theme_4:
+            c1.queue(theme_5)
+        elif actual_music==theme_5:
+            c1.queue(theme_6)
+        elif actual_music==theme_6:
+            c1.queue(theme_7)
+        elif actual_music==theme_7:
+            c1.queue(theme_8)
 
 def wall_collide(group): # check collide with the maze wall
     if (pygame.sprite.groupcollide(group, wall_group, False, False, pygame.sprite.collide_mask)):
